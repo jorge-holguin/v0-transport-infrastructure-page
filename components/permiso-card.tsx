@@ -146,22 +146,67 @@ export function PermisoCard({ id, title, chartData }: PermisoCardProps) {
             </div>
           </div>
 
-          {/* Estadísticas adicionales */}
-          <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-4">Estadísticas del Periodo</h4>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-500 mb-1">Promedio Mensual</p>
-                <p className="text-xl font-bold text-gray-900">{Math.round(total / 12).toLocaleString('es-PE')}</p>
+          {/* Detalles específicos por indicador */}
+          <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+            <div className="space-y-3">
+              <div className="text-gray-800">
+                <span className="font-semibold">Año:</span> {selectedYear}
               </div>
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-500 mb-1">Mes con Mayor Registro</p>
-                <p className="text-xl font-bold text-gray-900">{months[values.indexOf(maxValue)]}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-500 mb-1">Valor Máximo</p>
-                <p className="text-xl font-bold text-gray-900">{maxValue.toLocaleString('es-PE')}</p>
-              </div>
+              
+              {id === "P01" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Recaudación por Permisos:</span> {total.toLocaleString('es-PE')}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN
+                  </div>
+                </>
+              )}
+              
+              {id === "P02" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de autorizaciones:</span> {total.toLocaleString('es-PE')}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN, DUPLICADO, RENOVACIÓN
+                  </div>
+                </>
+              )}
+              
+              {id === "P03" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de por Licencias:</span> {total.toLocaleString('es-PE')}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN, DUPLICADO, RECATEGORIZADAS
+                  </div>
+                </>
+              )}
+              
+              {id === "P04" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Intervenciones:</span> {total.toLocaleString('es-PE')}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo de Acta de Control:</span> PJ01, PJ02, PJ03, C01, C02, C03
+                  </div>
+                </>
+              )}
+              
+              {id === "P05" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Empresas de Taxis:</span> {total.toLocaleString('es-PE')}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

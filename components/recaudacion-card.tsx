@@ -146,31 +146,62 @@ export function RecaudacionCard({ id, title, chartData }: RecaudacionCardProps) 
             </div>
           </div>
 
-          {/* Leyenda mejorada */}
-          <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-4">Desglose por Categoría</h4>
+          {/* Detalles específicos por indicador */}
+          <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0 shadow-sm" />
-                  <span className="text-sm font-medium text-gray-700">Intervenciones</span>
-                </div>
-                <span className="text-sm font-bold text-gray-900">S/ {chartData.intervenciones.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
+              <div className="text-gray-800">
+                <span className="font-semibold">Año:</span> {selectedYear}
               </div>
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-orange-300 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-orange-500 rounded-full flex-shrink-0 shadow-sm" />
-                  <span className="text-sm font-medium text-gray-700">Licencia de Conducir</span>
-                </div>
-                <span className="text-sm font-bold text-gray-900">S/ {chartData.licencias.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-green-500 rounded-full flex-shrink-0 shadow-sm" />
-                  <span className="text-sm font-medium text-gray-700">Autorizaciones</span>
-                </div>
-                <span className="text-sm font-bold text-gray-900">S/ {chartData.autorizaciones.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
-              </div>
+              
+              {id === "I01" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo de Recaudación:</span> NETO, BRUTO
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Recaudación:</span> S/ {total.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo de recaudación:</span> INTERVENCIÓN, LICENCIA, AUTORIZACIÓN, PERMISOS
+                  </div>
+                </>
+              )}
+              
+              {id === "I02" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Recaudación por autorizaciones:</span> S/ {chartData.autorizaciones.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN, DUPLICADO, RENOVACIÓN
+                  </div>
+                </>
+              )}
+              
+              {id === "I03" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Recaudación por Licencias:</span> S/ {chartData.licencias.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo:</span> EMISIÓN, DUPLICADO, RECATEGORIZADAS
+                  </div>
+                </>
+              )}
+              
+              {id === "I04" && (
+                <>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo de Recaudación:</span> NETO, BRUTO
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Total de Recaudación por Intervenciones:</span> S/ {chartData.intervenciones.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div className="text-gray-800">
+                    <span className="font-semibold">Por Tipo de Acta de Control:</span> PJ01, PJ02, PJ03, C01, C02, C03
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
