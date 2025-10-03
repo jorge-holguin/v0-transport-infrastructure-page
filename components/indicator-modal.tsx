@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { ChevronRight, Info } from "lucide-react"
+import { ChevronRight, Info, FileText, Calculator, BarChart3, Clock, Database, Users } from "lucide-react"
 
 interface IndicatorModalProps {
   id: string
@@ -36,67 +36,108 @@ export function IndicatorModal({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-600">
+        <Card className="group p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-500 bg-gradient-to-br from-white to-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">{id}</span>
-                <span className="text-xs text-gray-500">{group}</span>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{id}</span>
+                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{group}</span>
               </div>
-              <h4 className="font-semibold text-gray-900">{name}</h4>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{description}</p>
+              <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">{name}</h4>
+              <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{description}</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 ml-4" />
+            <div className="flex-shrink-0 ml-4 w-10 h-10 rounded-full bg-blue-100 group-hover:bg-blue-500 flex items-center justify-center transition-colors">
+              <ChevronRight className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+            </div>
           </div>
         </Card>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <span className="text-blue-600 font-bold">{id}</span>
-            <span className="text-gray-400">|</span>
-            <span>{name}</span>
-          </DialogTitle>
-          <DialogDescription className="text-left">
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
-              {group}
-            </span>
-          </DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="border-b pb-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full">{id}</span>
+              <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
+                {group}
+              </span>
+            </div>
+            <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+              {name}
+            </DialogTitle>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-4 mt-4">
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-              <Info className="w-4 h-4 text-blue-600" />
+        <div className="space-y-6 pt-4">
+          {/* Descripción */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Info className="w-5 h-5 text-blue-600" />
               Descripción
             </h4>
             <p className="text-gray-700 text-sm leading-relaxed">{description}</p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-gray-900 mb-2">Fórmula</h4>
-            <p className="text-gray-700 text-sm font-mono">{formula}</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1 text-sm">Unidad de medida</h4>
-              <p className="text-gray-700 text-sm">{unit}</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1 text-sm">Frecuencia</h4>
-              <p className="text-gray-700 text-sm">{frequency}</p>
+          {/* Fórmula */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-blue-600" />
+              Fórmula de Cálculo
+            </h4>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <p className="text-gray-700 text-sm font-mono leading-relaxed">{formula}</p>
             </div>
           </div>
 
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-1 text-sm">Fuente de Información</h4>
-            <p className="text-gray-700 text-sm">{source}</p>
+          {/* Información técnica */}
+          <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" />
+              Información Técnica
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="w-4 h-4 text-blue-600" />
+                  <h5 className="font-semibold text-gray-900 text-sm">Unidad de medida</h5>
+                </div>
+                <p className="text-gray-700 text-sm">{unit}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  <h5 className="font-semibold text-gray-900 text-sm">Frecuencia</h5>
+                </div>
+                <p className="text-gray-700 text-sm">{frequency}</p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-1 text-sm">Responsable</h4>
-            <p className="text-gray-700 text-sm">{responsible}</p>
+          {/* Fuente y Responsable */}
+          <div className="space-y-4">
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Database className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-semibold text-gray-900 text-sm mb-1">Fuente de Información</h5>
+                  <p className="text-gray-700 text-sm">{source}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-semibold text-gray-900 text-sm mb-1">Responsable</h5>
+                  <p className="text-gray-700 text-sm">{responsible}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </DialogContent>

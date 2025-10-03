@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Building2, CreditCard, ClipboardCheck } from "lucide-react"
 import { IndicatorModal } from "@/components/indicator-modal"
+import { RecaudacionCard } from "@/components/recaudacion-card"
+import { PermisoCard } from "@/components/permiso-card"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -125,39 +127,42 @@ export default function Home() {
                       <CreditCard className="w-8 h-8 text-blue-600" />
                       Indicadores de Recaudación
                     </h3>
-                    <div className="space-y-4">
-                      <IndicatorModal
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+                      <RecaudacionCard
                         id="I01"
-                        name="Monto total recaudado por autorizaciones"
-                        group="RECAUDACIÓN"
-                        description="Refleja el total de ingresos económicos obtenidos por la emisión de autorizaciones vinculadas al transporte durante un periodo determinado."
-                        formula="Monto total recaudado = Σ Ingresos registrados por autorizaciones emitidas"
-                        unit="S/ (Sol Peruano)"
-                        frequency="Mensual"
-                        source="Sistema tributario de SATP"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                        title="Recaudación Total"
+                        chartData={{
+                          intervenciones: 14000,
+                          licencias: 12000,
+                          autorizaciones: 15000
+                        }}
                       />
-                      <IndicatorModal
+                      <RecaudacionCard
                         id="I02"
-                        name="Monto total de recaudación de brevetes"
-                        group="RECAUDACIÓN"
-                        description="Refleja el total de ingresos obtenidos por la emisión, renovación y/o recategorización de licencias de conducir durante un periodo."
-                        formula="Monto total recaudado = Σ Ingresos por trámites de brevetes"
-                        unit="S/ (Sol Peruano)"
-                        frequency="Mensual"
-                        source="Sistema tributario de SATP"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                        title="Recaudación total por autorizaciones"
+                        chartData={{
+                          intervenciones: 5000,
+                          licencias: 0,
+                          autorizaciones: 14000
+                        }}
                       />
-                      <IndicatorModal
+                      <RecaudacionCard
                         id="I03"
-                        name="Monto total de recaudación por intervenciones"
-                        group="RECAUDACIÓN"
-                        description="Mide de total de ingresos obtenidos por la realización de intervenciones vinculadas al control, fiscalización o gestión del transporte."
-                        formula="Monto total recaudado = Σ Ingresos generados por intervenciones"
-                        unit="S/ (Sol Peruano)"
-                        frequency="Mensual"
-                        source="Sistema tributario de SATP"
-                        responsible="SATP"
+                        title="Recaudación Total por Licencia de Conducir"
+                        chartData={{
+                          intervenciones: 0,
+                          licencias: 12000,
+                          autorizaciones: 3000
+                        }}
+                      />
+                      <RecaudacionCard
+                        id="I04"
+                        title="Recaudación por Intervenciones"
+                        chartData={{
+                          intervenciones: 14000,
+                          licencias: 8000,
+                          autorizaciones: 5000
+                        }}
                       />
                     </div>
                   </Card>
@@ -169,61 +174,96 @@ export default function Home() {
                       <ClipboardCheck className="w-8 h-8 text-blue-600" />
                       Indicadores de Permisos
                     </h3>
-                    <div className="space-y-4">
-                      <IndicatorModal
-                        id="I04"
-                        name="Número de permisos de circulación"
-                        group="PERMISOS"
-                        description="Mide la cantidad total de permisos de circulación otorgados a vehículos de transporte durante un periodo determinado."
-                        formula="Número de permisos de circulación = Σ Permisos emitidos en el periodo"
-                        unit="Número de permisos"
-                        frequency="Mensual"
-                        source="Sistema de tramite documentario"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+                      <PermisoCard
+                        id="P01"
+                        title="Número de permisos de circulación"
+                        chartData={{
+                          enero: 120,
+                          febrero: 135,
+                          marzo: 150,
+                          abril: 142,
+                          mayo: 168,
+                          junio: 155,
+                          julio: 178,
+                          agosto: 165,
+                          septiembre: 190,
+                          octubre: 182,
+                          noviembre: 175,
+                          diciembre: 160
+                        }}
                       />
-                      <IndicatorModal
-                        id="I05"
-                        name="Número de autorizaciones"
-                        group="PERMISOS"
-                        description="Mide la cantidad total de autorizaciones otorgadas para actividades relacionadas con el transporte durante un periodo determinado."
-                        formula="Número de autorizaciones = Σ Permisos emitidos en el periodo"
-                        unit="Número de autorizaciones"
-                        frequency="Mensual"
-                        source="Sistema de tramite documentario"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                      <PermisoCard
+                        id="P02"
+                        title="Número de autorizaciones"
+                        chartData={{
+                          enero: 85,
+                          febrero: 92,
+                          marzo: 88,
+                          abril: 95,
+                          mayo: 110,
+                          junio: 105,
+                          julio: 118,
+                          agosto: 112,
+                          septiembre: 125,
+                          octubre: 130,
+                          noviembre: 122,
+                          diciembre: 115
+                        }}
                       />
-                      <IndicatorModal
-                        id="I06"
-                        name="Número de emisión de brevetes"
-                        group="PERMISOS"
-                        description="Mide la cantidad de licencias de conducir emitidas durante un periodo determinado, incluyendo nuevas emisiones, renovaciones y recategorizaciones."
-                        formula="Número de brevetes emitidos = Σ Brevetes otorgados en el periodo"
-                        unit="Número de brevetes"
-                        frequency="Mensual"
-                        source="Sistema de tramite documentario"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                      <PermisoCard
+                        id="P03"
+                        title="Número de emisión de brevetes"
+                        chartData={{
+                          enero: 200,
+                          febrero: 215,
+                          marzo: 230,
+                          abril: 225,
+                          mayo: 245,
+                          junio: 238,
+                          julio: 260,
+                          agosto: 255,
+                          septiembre: 270,
+                          octubre: 265,
+                          noviembre: 258,
+                          diciembre: 250
+                        }}
                       />
-                      <IndicatorModal
-                        id="I07"
-                        name="Número de intervenciones"
-                        group="PERMISOS"
-                        description="Mide la cantidad total de acciones de control, fiscalización o inspección realizadas sobre vehículos, operadores o rutas de transporte."
-                        formula="Número de intervenciones = Σ Intervenciones ejecutadas en el periodo"
-                        unit="Número de intervenciones"
-                        frequency="Mensual"
-                        source="Sistema de tramite documentario y Sistema de recaudación SATP"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                      <PermisoCard
+                        id="P04"
+                        title="Número de Intervenciones"
+                        chartData={{
+                          enero: 45,
+                          febrero: 52,
+                          marzo: 48,
+                          abril: 55,
+                          mayo: 62,
+                          junio: 58,
+                          julio: 68,
+                          agosto: 65,
+                          septiembre: 72,
+                          octubre: 70,
+                          noviembre: 66,
+                          diciembre: 60
+                        }}
                       />
-                      <IndicatorModal
-                        id="I09"
-                        name="Número de empresas de taxi formalizadas"
-                        group="PERMISOS"
-                        description="Mide la cantidad de empresas de taxi que han cumplido con los requisitos legales y administrativos establecidos por la autoridad para operar formalmente."
-                        formula="Número de empresas formalizadas = Σ empresas de taxi registradas y habilitadas en el periodo"
-                        unit="Número de empresas"
-                        frequency="Mensual"
-                        source="Sistema de Tramite documentario y archivos manuales"
-                        responsible="Gerencia de Transporte y Movilidad Urbana"
+                      <PermisoCard
+                        id="P05"
+                        title="Número de empresas de taxi formalizadas"
+                        chartData={{
+                          enero: 12,
+                          febrero: 15,
+                          marzo: 18,
+                          abril: 16,
+                          mayo: 20,
+                          junio: 22,
+                          julio: 25,
+                          agosto: 23,
+                          septiembre: 28,
+                          octubre: 30,
+                          noviembre: 27,
+                          diciembre: 25
+                        }}
                       />
                     </div>
                   </Card>
