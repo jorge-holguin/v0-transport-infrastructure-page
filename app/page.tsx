@@ -31,7 +31,8 @@ export default function Home() {
                   <Building2 className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-base font-bold text-gray-900 leading-tight">PLATAFORMA DE INDICADORES</h1>
+                  <h1 className="text-base font-bold text-gray-900 leading-tight">Indicadores de Gestión</h1>
+                  <p className="text-md text-gray-600 mt-0.5">Transporte</p>
                 </div>
               </div>
 
