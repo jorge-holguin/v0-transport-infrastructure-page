@@ -6,9 +6,33 @@ import { Building2, CreditCard, ClipboardCheck } from "lucide-react"
 import { IndicatorModal } from "@/components/indicator-modal"
 import { RecaudacionCard } from "@/components/recaudacion-card"
 import { PermisoCard } from "@/components/permiso-card"
+import { SubgerenciaCard } from "@/components/subgerencia-card"
+import { RecaudacionFilters } from "@/components/recaudacion-filters"
+import { ComparativoSubgerenciasModal } from "@/components/comparativo-subgerencias-modal"
+import { Building, Users, ShieldCheck, GraduationCap, BarChart3 } from "lucide-react"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  
+  // Estados para filtros de recaudación
+  const [selectedYear, setSelectedYear] = useState("2024")
+  const [selectedEstado, setSelectedEstado] = useState("Todos")
+  const [selectedMetrica, setSelectedMetrica] = useState<"soles" | "cantidad">("soles")
+  const [selectedSubgerencias, setSelectedSubgerencias] = useState<string[]>([
+    "Subgerencia de Transportes",
+    "Subgerencia de Fiscalización",
+    "Subgerencia de Tránsito y Movilidad Urbana",
+    "Subgerencia de Seguridad y Educación Vial"
+  ])
+  const [showComparativo, setShowComparativo] = useState(false)
+
+  // Datos para el gráfico comparativo
+  const subgerenciasData = [
+    { nombre: "Subgerencia de Transportes", soles: 285000, cantidad: 1450, color: "#3b82f6" },
+    { nombre: "Subgerencia de Fiscalización", soles: 145000, cantidad: 850, color: "#f97316" },
+    { nombre: "Subgerencia de Tránsito y Movilidad Urbana", soles: 195000, cantidad: 2850, color: "#10b981" },
+    { nombre: "Subgerencia de Seguridad y Educación Vial", soles: 45000, cantidad: 450, color: "#8b5cf6" }
+  ]
 
   return (
     <main className="min-h-screen relative">
@@ -74,7 +98,7 @@ export default function Home() {
         </header>
 
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto">
+          <div className={selectedCategory === "recaudacion" ? "max-w-7xl mx-auto" : "max-w-4xl mx-auto"}>
             {!selectedCategory ? (
               // Main Category Selection
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -123,50 +147,271 @@ export default function Home() {
                 </button>
 
                 {selectedCategory === "recaudacion" && (
-                  <Card className="bg-white/95 backdrop-blur-sm p-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                      <CreditCard className="w-8 h-8 text-blue-600" />
-                      Indicadores de Recaudación
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
-                      <RecaudacionCard
-                        id="I01"
-                        title="Recaudación Total"
-                        chartData={{
-                          intervenciones: 14000,
-                          licencias: 12000,
-                          autorizaciones: 15000
-                        }}
+                  <div className="space-y-6">
+                    <Card className="bg-white/95 backdrop-blur-sm p-8">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                        <CreditCard className="w-8 h-8 text-blue-600" />
+                        Indicadores de Recaudación - Gerencia de Transportes y Movilidad Urbana
+                      </h3>
+                      
+                      {/* Filtros Globales */}
+                      <RecaudacionFilters
+                        selectedYear={selectedYear}
+                        onYearChange={setSelectedYear}
+                        selectedEstado={selectedEstado}
+                        onEstadoChange={setSelectedEstado}
+                        selectedMetrica={selectedMetrica}
+                        onMetricaChange={setSelectedMetrica}
+                        selectedSubgerencias={selectedSubgerencias}
+                        onSubgerenciasChange={setSelectedSubgerencias}
+                        availableSubgerencias={[
+                          "Subgerencia de Transportes",
+                          "Subgerencia de Fiscalización",
+                          "Subgerencia de Tránsito y Movilidad Urbana",
+                          "Subgerencia de Seguridad y Educación Vial"
+                        ]}
                       />
-                      <RecaudacionCard
-                        id="I02"
-                        title="Recaudación total por autorizaciones"
-                        chartData={{
-                          intervenciones: 5000,
-                          licencias: 0,
-                          autorizaciones: 14000
-                        }}
-                      />
-                      <RecaudacionCard
-                        id="I03"
-                        title="Recaudación Total por Licencia de Conducir"
-                        chartData={{
-                          intervenciones: 0,
-                          licencias: 12000,
-                          autorizaciones: 3000
-                        }}
-                      />
-                      <RecaudacionCard
-                        id="I04"
-                        title="Recaudación por Intervenciones"
-                        chartData={{
-                          intervenciones: 14000,
-                          licencias: 8000,
-                          autorizaciones: 5000
-                        }}
-                      />
-                    </div>
-                  </Card>
+
+                      {/* Botón para ver gráfico comparativo */}
+                      <div className="mt-6 flex justify-center">
+                        <button
+                          onClick={() => setShowComparativo(true)}
+                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-3"
+                        >
+                          <BarChart3 className="w-6 h-6" />
+                          Ver Gráfico de Recaudación de las Subgerencias
+                        </button>
+                      </div>
+                    </Card>
+
+                    {/* Tarjetas de Nivel 1 - Subgerencias */}
+                    <Card className="bg-white/95 backdrop-blur-sm p-8">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-6">
+                        Nivel 1 - Resumen por Subgerencia
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Subgerencia de Fiscalización */}
+                        {selectedSubgerencias.includes("Subgerencia de Fiscalización") && (
+                          <SubgerenciaCard
+                            nombre="Subgerencia de Fiscalización"
+                            year={selectedYear}
+                            metrica={selectedMetrica}
+                            estado={selectedEstado}
+                            totalSoles={145000}
+                            totalCantidad={850}
+                            icon={<ShieldCheck className="w-6 h-6" />}
+                            detalles={[
+                              { 
+                                tipo: "Intervenciones", 
+                                soles: 145000, 
+                                cantidad: 850,
+                                subtipos: [
+                                  { subtipo: "PJ01 - Pago con descuento", soles: 55000, cantidad: 330 },
+                                  { subtipo: "PJ02 - Pago ordinario", soles: 42000, cantidad: 250 },
+                                  { subtipo: "PJ03 - Pago fraccionado", soles: 33000, cantidad: 190 },
+                                  { subtipo: "C01 - Citación primera", soles: 5000, cantidad: 30 },
+                                  { subtipo: "C02 - Citación segunda", soles: 6000, cantidad: 35 },
+                                  { subtipo: "C03 - Citación final", soles: 4000, cantidad: 15 }
+                                ]
+                              }
+                            ]}
+                          />
+                        )}
+
+                        {/* Subgerencia de Transportes */}
+                        {selectedSubgerencias.includes("Subgerencia de Transportes") && (
+                          <SubgerenciaCard
+                            nombre="Subgerencia de Transportes"
+                            year={selectedYear}
+                            metrica={selectedMetrica}
+                            estado={selectedEstado}
+                            totalSoles={285000}
+                            totalCantidad={1450}
+                            icon={<Building className="w-6 h-6" />}
+                            detalles={[
+                              { 
+                                tipo: "Transporte Especial de Trabajadores", 
+                                soles: 63000, 
+                                cantidad: 330,
+                                subtipos: [
+                                  { subtipo: "Autorización", soles: 35000, cantidad: 180 },
+                                  { subtipo: "Habilitación Vehicular (TUC)", soles: 28000, cantidad: 150 }
+                                ]
+                              },
+                              { 
+                                tipo: "Transporte Especial de Turismo", 
+                                soles: 57000, 
+                                cantidad: 300,
+                                subtipos: [
+                                  { subtipo: "Autorización", soles: 32000, cantidad: 160 },
+                                  { subtipo: "Habilitación Vehicular (TUC)", soles: 25000, cantidad: 140 }
+                                ]
+                              },
+                              { 
+                                tipo: "Transporte Especial Estudiantes", 
+                                soles: 48000, 
+                                cantidad: 270,
+                                subtipos: [
+                                  { subtipo: "Autorización", soles: 22000, cantidad: 120 },
+                                  { subtipo: "Renovación", soles: 18000, cantidad: 100 },
+                                  { subtipo: "Duplicados", soles: 8000, cantidad: 50 }
+                                ]
+                              },
+                              { 
+                                tipo: "Transporte Urbano", 
+                                soles: 53000, 
+                                cantidad: 255,
+                                subtipos: [
+                                  { subtipo: "Sustitución", soles: 20000, cantidad: 90 },
+                                  { subtipo: "Habilitación", soles: 15000, cantidad: 80 },
+                                  { subtipo: "Autorización", soles: 18000, cantidad: 85 }
+                                ]
+                              },
+                              { 
+                                tipo: "Carga/Descarga", 
+                                soles: 12000, 
+                                cantidad: 70,
+                                subtipos: [
+                                  { subtipo: "Autorizaciones", soles: 12000, cantidad: 70 }
+                                ]
+                              },
+                              { 
+                                tipo: "Vehículos Menores", 
+                                soles: 36000, 
+                                cantidad: 210,
+                                subtipos: [
+                                  { subtipo: "Renovación", soles: 10000, cantidad: 60 },
+                                  { subtipo: "Incremento de flota", soles: 8000, cantidad: 45 },
+                                  { subtipo: "Sustitución de flota", soles: 7000, cantidad: 40 },
+                                  { subtipo: "Emisión TUC", soles: 6000, cantidad: 35 },
+                                  { subtipo: "Renovación TUC", soles: 5000, cantidad: 30 }
+                                ]
+                              },
+                              { 
+                                tipo: "Certificación", 
+                                soles: 13000, 
+                                cantidad: 83,
+                                subtipos: [
+                                  { subtipo: "Taxis", soles: 3000, cantidad: 20 },
+                                  { subtipo: "Vehículos menores", soles: 2500, cantidad: 18 },
+                                  { subtipo: "Transporte Urbano", soles: 2000, cantidad: 15 },
+                                  { subtipo: "Transporte Especial Estudiantes", soles: 1800, cantidad: 12 },
+                                  { subtipo: "Transporte Especial Trabajadores", soles: 1700, cantidad: 10 },
+                                  { subtipo: "Transporte Especial Turismo", soles: 2000, cantidad: 8 }
+                                ]
+                              },
+                              { 
+                                tipo: "Taxis Dispersos", 
+                                soles: 3500, 
+                                cantidad: 22,
+                                subtipos: [
+                                  { subtipo: "Autorización", soles: 2000, cantidad: 12 },
+                                  { subtipo: "Renovación TUC", soles: 1500, cantidad: 10 }
+                                ]
+                              },
+                              { 
+                                tipo: "Taxis Remix", 
+                                soles: 4800, 
+                                cantidad: 35,
+                                subtipos: [
+                                  { subtipo: "Autorización", soles: 1800, cantidad: 11 },
+                                  { subtipo: "Habilitaciones", soles: 1200, cantidad: 9 },
+                                  { subtipo: "Renovación TUC", soles: 1000, cantidad: 8 },
+                                  { subtipo: "Sustitución Vehicular", soles: 800, cantidad: 7 }
+                                ]
+                              }
+                            ]}
+                          />
+                        )}
+
+                        {/* Subgerencia de Tránsito y Movilidad Urbana */}
+                        {selectedSubgerencias.includes("Subgerencia de Tránsito y Movilidad Urbana") && (
+                          <SubgerenciaCard
+                            nombre="Subgerencia de Tránsito y Movilidad Urbana"
+                            year={selectedYear}
+                            metrica={selectedMetrica}
+                            estado={selectedEstado}
+                            totalSoles={195000}
+                            totalCantidad={2850}
+                            icon={<Users className="w-6 h-6" />}
+                            detalles={[
+                              { 
+                                tipo: "Licencia Conducir Clase B-IIB", 
+                                soles: 140000, 
+                                cantidad: 2250,
+                                subtipos: [
+                                  { subtipo: "Emisión", soles: 80000, cantidad: 1200 },
+                                  { subtipo: "Revalidación", soles: 45000, cantidad: 750 },
+                                  { subtipo: "Duplicado", soles: 15000, cantidad: 300 }
+                                ]
+                              },
+                              { 
+                                tipo: "Licencia Conducir Clase B-IIC", 
+                                soles: 55000, 
+                                cantidad: 600,
+                                subtipos: [
+                                  { subtipo: "Emisión", soles: 35000, cantidad: 400 },
+                                  { subtipo: "Revalidación", soles: 15000, cantidad: 150 },
+                                  { subtipo: "Duplicado", soles: 5000, cantidad: 50 }
+                                ]
+                              },
+                              { 
+                                tipo: "Certificaciones", 
+                                soles: 0, 
+                                cantidad: 0,
+                                subtipos: [
+                                  { subtipo: "Emisiones", soles: 0, cantidad: 0 }
+                                ]
+                              },
+                              { 
+                                tipo: "Señalización Horizontal Vías", 
+                                soles: 0, 
+                                cantidad: 0,
+                                subtipos: [
+                                  { subtipo: "m2", soles: 0, cantidad: 0 },
+                                  { subtipo: "km", soles: 0, cantidad: 0 }
+                                ]
+                              }
+                            ]}
+                          />
+                        )}
+
+                        {/* Subgerencia de Seguridad y Educación Vial */}
+                        {selectedSubgerencias.includes("Subgerencia de Seguridad y Educación Vial") && (
+                          <SubgerenciaCard
+                            nombre="Subgerencia de Seguridad y Educación Vial"
+                            year={selectedYear}
+                            metrica={selectedMetrica}
+                            estado={selectedEstado}
+                            totalSoles={45000}
+                            totalCantidad={450}
+                            icon={<GraduationCap className="w-6 h-6" />}
+                            detalles={[
+                              { 
+                                tipo: "Capacitación Vial", 
+                                soles: 45000, 
+                                cantidad: 450,
+                                subtipos: [
+                                  { subtipo: "Capacitación para Vehículos menores", soles: 18000, cantidad: 180 },
+                                  { subtipo: "Capacitación para Taxi", soles: 15000, cantidad: 150 },
+                                  { subtipo: "Capacitación para Transporte urbano", soles: 12000, cantidad: 120 }
+                                ]
+                              }
+                            ]}
+                          />
+                        )}
+                      </div>
+                    </Card>
+
+                    {/* Modal Comparativo */}
+                    <ComparativoSubgerenciasModal
+                      isOpen={showComparativo}
+                      onClose={() => setShowComparativo(false)}
+                      year={selectedYear}
+                      metrica={selectedMetrica}
+                      subgerencias={subgerenciasData}
+                    />
+                  </div>
                 )}
 
                 {selectedCategory === "permisos" && (
