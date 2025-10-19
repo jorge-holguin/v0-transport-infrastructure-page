@@ -56,8 +56,8 @@ export function ComparativoSubgerenciasModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="!max-w-[60vw] !w-[60vw] h-[85vh] overflow-hidden flex flex-col p-6"
-        style={{ maxWidth: '90vw', width: '90vw' }}
+        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] h-[100vh] md:h-[85vh] overflow-x-hidden overflow-y-auto flex flex-col p-3 md:p-4 lg:p-6"
+        style={{ maxWidth: '100vw', width: '100vw' }}
       >
         <DialogHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
@@ -109,14 +109,15 @@ export function ComparativoSubgerenciasModal({
           </div>
 
           {/* Layout horizontal: Gráfico + Leyenda */}
-          <div className="flex-1 flex gap-8 min-h-0 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-8 min-h-0 bg-white p-4 lg:p-6 rounded-xl border border-gray-200 shadow-sm">
             {/* Gráfico circular */}
             <div className="flex-shrink-0 flex flex-col items-center justify-center">
-              <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
-                Distribución por Subgerencia
+              <h4 className="text-xs lg:text-sm font-semibold text-gray-700 mb-3 lg:mb-4 flex items-center gap-2">
+                <TrendingUp className="w-3 h-3 lg:w-4 lg:h-4 text-blue-600" />
+                <span className="hidden lg:inline">Distribución por Subgerencia</span>
+                <span className="lg:hidden">Distribución</span>
               </h4>
-              <div className="relative w-[400px] h-[400px]">
+              <div className="relative w-[280px] h-[280px] lg:w-[350px] lg:h-[350px] xl:w-[400px] xl:h-[400px]">
                 <div 
                   className="w-full h-full rounded-full shadow-2xl"
                   style={{
@@ -128,8 +129,8 @@ export function ComparativoSubgerenciasModal({
 
             {/* Leyenda horizontal */}
             <div className="flex-1 min-w-0 flex flex-col">
-              <h5 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Leyenda - Subgerencias</h5>
-              <div className="flex-1 grid grid-cols-2 gap-4 content-start">
+              <h5 className="text-xs lg:text-sm font-bold text-gray-900 mb-3 lg:mb-4 uppercase tracking-wide">Leyenda - Subgerencias</h5>
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 content-start">
                 {segments.map((seg, index) => (
                   <div key={index} className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-all">
                     <div className="flex items-start gap-3">

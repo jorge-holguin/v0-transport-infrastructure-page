@@ -66,9 +66,9 @@ function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], me
   }).join(', ')
 
   return (
-    <div className="flex items-center gap-4">
-      {/* Gráfico circular */}
-      <div className="relative w-56 h-56 flex-shrink-0">
+    <div className="flex flex-col items-center gap-3 w-full">
+      {/* Gráfico circular - más pequeño en móvil */}
+      <div className="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 flex-shrink-0">
         <div 
           className="w-full h-full rounded-full shadow-2xl"
           style={{
@@ -77,18 +77,18 @@ function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], me
         />
       </div>
 
-      {/* Leyenda a la derecha */}
-      <div className="flex-1 min-w-0">
-        <div className="grid grid-cols-2 gap-2">
+      {/* Leyenda debajo - compacta para móvil */}
+      <div className="w-full max-w-md">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {segments.map((seg, index) => (
-            <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+            <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
               <div 
-                className="w-3 h-3 rounded flex-shrink-0 shadow" 
+                className="w-4 h-4 rounded flex-shrink-0 shadow-md" 
                 style={{ backgroundColor: seg.color }}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-gray-900 truncate leading-tight">{seg.subtipo.subtipo}</p>
-                <p className="text-[10px] text-gray-600 font-semibold">
+                <p className="text-xs font-semibold text-gray-900 truncate leading-tight">{seg.subtipo.subtipo}</p>
+                <p className="text-xs text-gray-600 font-bold">
                   {seg.percentage.toFixed(1)}%
                 </p>
               </div>
@@ -115,8 +115,8 @@ export function TipoDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="!max-w-[60vw] !w-[60vw] h-[90vh] overflow-hidden flex flex-col p-6"
-        style={{ maxWidth: '60vw', width: '60vw' }}
+        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] h-[100vh] md:h-[90vh] overflow-x-hidden overflow-y-auto flex flex-col p-3 md:p-4 lg:p-6"
+        style={{ maxWidth: '100vw', width: '100vw' }}
       >
         <DialogHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
@@ -170,26 +170,25 @@ export function TipoDetailModal({
             </div>
           </div>
 
-          {/* Layout horizontal: Gráfico + Detalles */}
-          <div className="flex-1 flex gap-6 min-h-0">
+          {/* Layout vertical para móvil */}
+          <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-y-auto">
             {/* Gráfico de Torta */}
-            <div className="flex-shrink-0 bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-purple-600" />
-                Distribución por Subtipo
+            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+              <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 justify-center">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
+                <span>Distribución por Subtipo</span>
               </h4>
               <SubtipoPieChart subtipos={subtipos} metrica={metrica} />
             </div>
 
             {/* Detalles por subtipo - grid compacto */}
-            <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-              <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-purple-600" />
-                Detalle por Subtipo
+            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+              <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
+                <span>Detalle por Subtipo</span>
               </h4>
               
-              <div className="flex-1 overflow-y-auto pr-2">
-                <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                   {subtipos.map((subtipo, index) => (
                     <Card key={index} className="p-3 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 hover:border-purple-400 transition-all">
                       <div className="space-y-1">
@@ -225,7 +224,6 @@ export function TipoDetailModal({
                     </Card>
                   ))}
                 </div>
-              </div>
             </div>
           </div>
         </div>
