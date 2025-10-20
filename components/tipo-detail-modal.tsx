@@ -25,7 +25,7 @@ interface TipoDetailModalProps {
 
 // Colores para el gráfico de torta
 const CHART_COLORS = [
-  '#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b',
+  '#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#ec4899', '#f59e0a',
   '#06b6d4', '#6366f1', '#14b8a6', '#f43f5e', '#84cc16', '#a855f7'
 ]
 
