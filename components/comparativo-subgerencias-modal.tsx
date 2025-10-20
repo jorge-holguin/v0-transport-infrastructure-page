@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { TrendingUp, DollarSign, Hash, ArrowLeft } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TrendingUp, ArrowLeft } from "lucide-react"
 
 interface SubgerenciaData {
   nombre: string
@@ -25,33 +27,28 @@ export function ComparativoSubgerenciasModal({
   metrica,
   subgerencias
 }: ComparativoSubgerenciasModalProps) {
-  // Calcular total
+  const [tipoRecaudacion, setTipoRecaudacion] = useState<"cobradas" | "por-cobrar">("cobradas")
+
+  // Calcular total basado en el tipo de recaudación
+  // Para este ejemplo, usamos los valores actuales para "cobradas"
+  // y calculamos un porcentaje para "por cobrar" (30% del total)
   const total = subgerencias.reduce((sum, sub) => {
     const value = metrica === "soles" ? sub.soles : sub.cantidad
-    return sum + value
+    const adjustedValue = tipoRecaudacion === "cobradas" ? value : value * 0.3
+    return sum + adjustedValue
   }, 0)
 
-  // Calcular ángulos para cada segmento
-  let currentAngle = 0
+  // Calcular porcentajes para cada subgerencia según tipo de recaudación
   const segments = subgerencias.map((sub) => {
-    const value = metrica === "soles" ? sub.soles : sub.cantidad
+    const baseValue = metrica === "soles" ? sub.soles : sub.cantidad
+    const value = tipoRecaudacion === "cobradas" ? baseValue : baseValue * 0.3
     const percentage = total > 0 ? (value / total) * 100 : 0
-    const angle = (percentage / 100) * 360
-    const segment = {
+    return {
       subgerencia: sub,
       value,
-      percentage,
-      startAngle: currentAngle,
-      endAngle: currentAngle + angle
+      percentage
     }
-    currentAngle += angle
-    return segment
   })
-
-  // Crear el gradiente cónico
-  const gradientStops = segments.map((seg) => {
-    return `${seg.subgerencia.color} ${seg.startAngle}deg ${seg.endAngle}deg`
-  }).join(', ')
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -108,53 +105,85 @@ export function ComparativoSubgerenciasModal({
             </div>
           </div>
 
-          {/* Layout horizontal: Gráfico + Leyenda */}
-          <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-8 min-h-0 bg-white p-4 lg:p-6 rounded-xl border border-gray-200 shadow-sm">
-            {/* Gráfico circular */}
-            <div className="flex-shrink-0 flex flex-col items-center justify-center">
+          {/* Layout: Gráfico de Barras + Leyenda */}
+          <div className="flex-1 flex flex-col gap-4 min-h-0">
+            {/* Gráfico de Barras Horizontales */}
+            <div className="bg-white p-4 lg:p-6 rounded-xl border border-gray-200 shadow-sm">
               <h4 className="text-xs lg:text-sm font-semibold text-gray-700 mb-3 lg:mb-4 flex items-center gap-2">
                 <TrendingUp className="w-3 h-3 lg:w-4 lg:h-4 text-blue-600" />
-                <span className="hidden lg:inline">Distribución por Subgerencia</span>
-                <span className="lg:hidden">Distribución</span>
+                Distribución por Subgerencia
               </h4>
-              <div className="relative w-[280px] h-[280px] lg:w-[350px] lg:h-[350px] xl:w-[400px] xl:h-[400px]">
-                <div 
-                  className="w-full h-full rounded-full shadow-2xl"
-                  style={{
-                    background: total > 0 ? `conic-gradient(from 0deg, ${gradientStops})` : '#e5e7eb'
-                  }}
-                />
+              <div className="w-full">
+                {/* Gráfico de barras horizontales */}
+                <div className="space-y-4">
+                  {segments.map((seg, index) => {
+                    const maxValue = Math.max(...segments.map(s => s.value))
+                    const barWidth = total > 0 ? (seg.value / maxValue) * 100 : 0
+                    
+                    return (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-semibold text-gray-700 flex-1 min-w-0 pr-4">
+                            {seg.subgerencia.nombre}
+                          </span>
+                          <span className="font-bold text-blue-600 whitespace-nowrap">
+                            {seg.percentage.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="relative h-10 bg-gray-100 rounded-lg overflow-hidden">
+                          <div 
+                            className="absolute inset-y-0 left-0 rounded-lg transition-all duration-500 flex items-center justify-end pr-3"
+                            style={{ 
+                              width: `${barWidth}%`,
+                              backgroundColor: seg.subgerencia.color
+                            }}
+                          >
+                            <span className="text-white font-bold text-sm">
+                              {metrica === "soles" 
+                                ? `S/ ${seg.value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                                : `${seg.value.toLocaleString('es-PE')} unidades`
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Leyenda horizontal */}
-            <div className="flex-1 min-w-0 flex flex-col">
+            {/* Selector de Tipo de Recaudación */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 lg:p-6 rounded-xl border border-blue-200 shadow-sm">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                  Tipo de Recaudación:
+                </label>
+                <Select value={tipoRecaudacion} onValueChange={(value: "cobradas" | "por-cobrar") => setTipoRecaudacion(value)}>
+                  <SelectTrigger className="max-w-xs bg-white border-blue-300 hover:border-blue-500 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cobradas">Cuentas Cobradas</SelectItem>
+                    <SelectItem value="por-cobrar">Cuentas por Cobrar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Leyenda consolidada en un solo cuadro */}
+            <div className="bg-white p-4 lg:p-6 rounded-xl border border-gray-200 shadow-sm">
               <h5 className="text-xs lg:text-sm font-bold text-gray-900 mb-3 lg:mb-4 uppercase tracking-wide">Leyenda - Subgerencias</h5>
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 content-start">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                 {segments.map((seg, index) => (
-                  <div key={index} className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-all">
-                    <div className="flex items-start gap-3">
-                      <div 
-                        className="w-6 h-6 rounded flex-shrink-0 shadow-md mt-1" 
-                        style={{ backgroundColor: seg.subgerencia.color }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h5 className="font-bold text-gray-900 text-sm mb-2 leading-tight">
-                          {seg.subgerencia.nombre}
-                        </h5>
-                        <div className="flex items-baseline gap-3">
-                          <span className="text-xl font-bold text-blue-600">
-                            {seg.percentage.toFixed(1)}%
-                          </span>
-                          <span className="text-sm text-gray-700 font-semibold">
-                            {metrica === "soles" 
-                              ? `S/ ${seg.value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-                              : `${seg.value.toLocaleString('es-PE')} unidades`
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  <div key={index} className="flex items-center gap-2">
+                    <div 
+                      className="w-5 h-5 rounded flex-shrink-0 shadow-md" 
+                      style={{ backgroundColor: seg.subgerencia.color }}
+                    />
+                    <span className="text-sm text-gray-700 font-medium leading-tight">
+                      {seg.subgerencia.nombre}
+                    </span>
                   </div>
                 ))}
               </div>

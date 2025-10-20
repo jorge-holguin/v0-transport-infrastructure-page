@@ -101,9 +101,9 @@ export default function Home() {
           <div className={selectedCategory === "recaudacion" ? "max-w-7xl mx-auto" : "max-w-4xl mx-auto"}>
             {!selectedCategory ? (
               // Main Category Selection
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex justify-center">
                 <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group max-w-md w-full"
                   onClick={() => setSelectedCategory("recaudacion")}
                 >
                   <div className="p-12 flex flex-col items-center text-center gap-6">
@@ -114,23 +114,6 @@ export default function Home() {
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
                         Montos totales recaudados por autorizaciones, brevetes e intervenciones
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  onClick={() => setSelectedCategory("permisos")}
-                >
-                  <div className="p-12 flex flex-col items-center text-center gap-6">
-                    <ClipboardCheck className="w-24 h-24 text-blue-600 group-hover:text-white transition-colors" />
-                    <div>
-                      <h3 className="font-bold text-2xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Permisos
-                      </h3>
-                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
-                        Autorizaciones, licencias, intervenciones y empresas formalizadas
                       </p>
                     </div>
                   </div>
@@ -149,10 +132,13 @@ export default function Home() {
                 {selectedCategory === "recaudacion" && (
                   <div className="space-y-6">
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                        <CreditCard className="w-8 h-8 text-blue-600" />
-                        Indicadores de Recaudación - Gerencia de Transportes y Movilidad Urbana
-                      </h3>
+                      <div className="mb-6">
+                        <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-2">
+                          <CreditCard className="w-8 h-8 text-blue-600" />
+                          Indicadores de la Gerencia de Transportes
+                        </h3>
+                        <p className="text-lg text-gray-600 ml-11">Primera Versión del Tablero de Indicadores</p>
+                      </div>
                       
                       {/* Filtros Globales */}
                       <RecaudacionFilters
