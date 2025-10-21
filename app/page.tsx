@@ -26,12 +26,40 @@ export default function Home() {
   ])
   const [showComparativo, setShowComparativo] = useState(false)
 
-  // Datos para el gráfico comparativo
+  // Datos para el gráfico comparativo con avance y meta
   const subgerenciasData = [
-    { nombre: "Subgerencia de Transportes", soles: 285000, cantidad: 1450, color: "#3b82f6" },
-    { nombre: "Subgerencia de Fiscalización", soles: 145000, cantidad: 850, color: "#f97316" },
-    { nombre: "Subgerencia de Tránsito y Movilidad Urbana", soles: 195000, cantidad: 2850, color: "#10b981" },
-    { nombre: "Subgerencia de Seguridad y Educación Vial", soles: 45000, cantidad: 450, color: "#8b5cf6" }
+    { 
+      nombre: "Subgerencia de Transportes", 
+      soles: 285000, 
+      cantidad: 1450, 
+      metaSoles: 400000, 
+      metaCantidad: 2000, 
+      color: "#3b82f6" 
+    },
+    { 
+      nombre: "Subgerencia de Fiscalización", 
+      soles: 145000, 
+      cantidad: 850, 
+      metaSoles: 180000, 
+      metaCantidad: 1100, 
+      color: "#f97316" 
+    },
+    { 
+      nombre: "Subgerencia de Tránsito y Movilidad Urbana", 
+      soles: 195000, 
+      cantidad: 2850, 
+      metaSoles: 220000, 
+      metaCantidad: 3200, 
+      color: "#10b981" 
+    },
+    { 
+      nombre: "Subgerencia de Seguridad y Educación Vial", 
+      soles: 45000, 
+      cantidad: 450, 
+      metaSoles: 60000, 
+      metaCantidad: 600, 
+      color: "#8b5cf6" 
+    }
   ]
 
   return (

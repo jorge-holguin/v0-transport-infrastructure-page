@@ -9,6 +9,8 @@ interface SubgerenciaData {
   nombre: string
   soles: number
   cantidad: number
+  metaSoles: number
+  metaCantidad: number
   color: string
 }
 
@@ -29,24 +31,34 @@ export function ComparativoSubgerenciasModal({
 }: ComparativoSubgerenciasModalProps) {
   const [tipoRecaudacion, setTipoRecaudacion] = useState<"cobradas" | "por-cobrar">("cobradas")
 
-  // Calcular total basado en el tipo de recaudación
-  // Para este ejemplo, usamos los valores actuales para "cobradas"
-  // y calculamos un porcentaje para "por cobrar" (30% del total)
-  const total = subgerencias.reduce((sum, sub) => {
+  // Calcular total de avance y meta
+  const totalAvance = subgerencias.reduce((sum, sub) => {
     const value = metrica === "soles" ? sub.soles : sub.cantidad
     const adjustedValue = tipoRecaudacion === "cobradas" ? value : value * 0.3
     return sum + adjustedValue
   }, 0)
 
-  // Calcular porcentajes para cada subgerencia según tipo de recaudación
+  const totalMeta = subgerencias.reduce((sum, sub) => {
+    const meta = metrica === "soles" ? sub.metaSoles : sub.metaCantidad
+    return sum + meta
+  }, 0)
+
+  // Calcular datos para cada subgerencia
   const segments = subgerencias.map((sub) => {
     const baseValue = metrica === "soles" ? sub.soles : sub.cantidad
-    const value = tipoRecaudacion === "cobradas" ? baseValue : baseValue * 0.3
-    const percentage = total > 0 ? (value / total) * 100 : 0
+    const avance = tipoRecaudacion === "cobradas" ? baseValue : baseValue * 0.3
+    const meta = metrica === "soles" ? sub.metaSoles : sub.metaCantidad
+    const percentage = totalAvance > 0 ? (avance / totalAvance) * 100 : 0
+    const cumplimiento = meta > 0 ? (avance / meta) * 100 : 0
+    const brecha = meta - avance
+    
     return {
       subgerencia: sub,
-      value,
-      percentage
+      avance,
+      meta,
+      percentage,
+      cumplimiento,
+      brecha
     }
   })
 
@@ -86,16 +98,31 @@ export function ComparativoSubgerenciasModal({
           {/* Total destacado - compacto */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-xs font-medium mb-1">
-                  {metrica === "soles" ? "Total Recaudación General" : "Total Cantidad General"}
-                </p>
-                <p className="text-2xl font-bold">
-                  {metrica === "soles" 
-                    ? `S/ ${total.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-                    : `${total.toLocaleString('es-PE')} unidades`
-                  }
-                </p>
+              <div className="flex gap-8">
+                <div>
+                  <p className="text-blue-100 text-xs font-medium mb-1">Avance Total</p>
+                  <p className="text-2xl font-bold">
+                    {metrica === "soles" 
+                      ? `S/ ${totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                      : `${totalAvance.toLocaleString('es-PE')} unidades`
+                    }
+                  </p>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-xs font-medium mb-1">Meta Total</p>
+                  <p className="text-2xl font-bold">
+                    {metrica === "soles" 
+                      ? `S/ ${totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                      : `${totalMeta.toLocaleString('es-PE')} unidades`
+                    }
+                  </p>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-xs font-medium mb-1">Cumplimiento</p>
+                  <p className="text-2xl font-bold">
+                    {totalMeta > 0 ? ((totalAvance / totalMeta) * 100).toFixed(1) : 0}%
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <div><span className="font-semibold">Año:</span> {year}</div>
@@ -114,11 +141,21 @@ export function ComparativoSubgerenciasModal({
                 Distribución por Subgerencia
               </h4>
               <div className="w-full">
-                {/* Gráfico de barras horizontales */}
-                <div className="space-y-4">
+                {/* Gráfico de barras horizontales con avance y meta */}
+                <div className="space-y-6">
                   {segments.map((seg, index) => {
-                    const maxValue = Math.max(...segments.map(s => s.value))
-                    const barWidth = total > 0 ? (seg.value / maxValue) * 100 : 0
+                    const maxValue = Math.max(...segments.map(s => s.meta))
+                    const avanceWidth = maxValue > 0 ? (seg.avance / maxValue) * 100 : 0
+                    
+                    // Determinar color del cumplimiento
+                    let cumplimientoColor = 'text-red-600'
+                    if (seg.cumplimiento >= 100) {
+                      cumplimientoColor = 'text-green-600'
+                    } else if (seg.cumplimiento >= 75) {
+                      cumplimientoColor = 'text-blue-600'
+                    } else if (seg.cumplimiento >= 50) {
+                      cumplimientoColor = 'text-orange-600'
+                    }
                     
                     return (
                       <div key={index} className="space-y-2">
@@ -126,25 +163,63 @@ export function ComparativoSubgerenciasModal({
                           <span className="font-semibold text-gray-700 flex-1 min-w-0 pr-4">
                             {seg.subgerencia.nombre}
                           </span>
-                          <span className="font-bold text-blue-600 whitespace-nowrap">
-                            {seg.percentage.toFixed(1)}%
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-gray-500">
+                              Cumplimiento:
+                            </span>
+                            <span className={`font-bold whitespace-nowrap ${cumplimientoColor}`}>
+                              {seg.cumplimiento.toFixed(1)}%
+                            </span>
+                          </div>
                         </div>
-                        <div className="relative h-10 bg-gray-100 rounded-lg overflow-hidden">
+                        
+                        {/* Barra de avance sobre fondo de meta */}
+                        <div className="relative h-12 bg-gray-200 rounded-lg overflow-hidden">
+                          {/* Barra de avance */}
                           <div 
                             className="absolute inset-y-0 left-0 rounded-lg transition-all duration-500 flex items-center justify-end pr-3"
                             style={{ 
-                              width: `${barWidth}%`,
+                              width: `${avanceWidth}%`,
                               backgroundColor: seg.subgerencia.color
                             }}
                           >
                             <span className="text-white font-bold text-sm">
                               {metrica === "soles" 
-                                ? `S/ ${seg.value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-                                : `${seg.value.toLocaleString('es-PE')} unidades`
+                                ? `S/ ${seg.avance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                                : `${seg.avance.toLocaleString('es-PE')}`
                               }
                             </span>
                           </div>
+                          
+                          {/* Indicador de meta (línea vertical) */}
+                          <div className="absolute inset-y-0 right-0 w-1 bg-gray-800"></div>
+                        </div>
+                        
+                        {/* Información de avance y meta */}
+                        <div className="flex items-center justify-between text-xs text-gray-600">
+                          <div className="flex items-center gap-4">
+                            <span>
+                              <span className="font-semibold">Avance:</span>{' '}
+                              {metrica === "soles" 
+                                ? `S/ ${seg.avance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                                : `${seg.avance.toLocaleString('es-PE')} unidades`
+                              }
+                            </span>
+                            <span>
+                              <span className="font-semibold">Meta:</span>{' '}
+                              {metrica === "soles" 
+                                ? `S/ ${seg.meta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                                : `${seg.meta.toLocaleString('es-PE')} unidades`
+                              }
+                            </span>
+                          </div>
+                          <span className={seg.brecha > 0 ? 'text-red-600 font-semibold' : 'text-green-600 font-semibold'}>
+                            {seg.brecha > 0 ? 'Brecha: ' : 'Superado: '}
+                            {metrica === "soles" 
+                              ? `S/ ${Math.abs(seg.brecha).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+                              : `${Math.abs(seg.brecha).toLocaleString('es-PE')} unidades`
+                            }
+                          </span>
                         </div>
                       </div>
                     )
