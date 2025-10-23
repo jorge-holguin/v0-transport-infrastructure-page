@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import { Building2, CreditCard, ClipboardCheck } from "lucide-react"
+import { CreditCard, ClipboardCheck } from "lucide-react"
 import { IndicatorModal } from "@/components/indicator-modal"
 import { RecaudacionCard } from "@/components/recaudacion-card"
 import { PermisoCard } from "@/components/permiso-card"
@@ -10,6 +10,7 @@ import { SubgerenciaCard } from "@/components/subgerencia-card"
 import { RecaudacionFilters } from "@/components/recaudacion-filters"
 import { ComparativoSubgerenciasModal } from "@/components/comparativo-subgerencias-modal"
 import { Building, Users, ShieldCheck, GraduationCap, BarChart3 } from "lucide-react"
+import { CustomNavbar } from "@/components/custom-navbar"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -71,59 +72,7 @@ export default function Home() {
 
       {/* Content */}
       <div className="relative z-10">
-        <header className="bg-white shadow-sm">
-          {/* Light gray top bar */}
-          <div className="bg-gray-100 h-6"></div>
-
-          {/* Main navbar */}
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-500 rounded flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-base font-bold text-gray-900 leading-tight">Indicadores de Gestión</h1>
-                  <p className="text-md text-gray-600 mt-0.5">Transporte</p>
-                </div>
-              </div>
-
-              {/* Right side - Partner logos */}
-              <div className="flex items-center gap-8">
-                {/* CIMO Logo */}
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-red-600 leading-none">CIMO</div>
-                  <div className="text-xs text-gray-600 mt-0.5">Ciudades en movimiento</div>
-                </div>
-
-                {/* PROMOVILIDAD Logo */}
-                <div className="text-center">
-                  <div className="flex items-center gap-1">
-                    <div className="flex gap-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                    </div>
-                    <span className="text-xl font-bold text-purple-600">PROMOVILIDAD</span>
-                  </div>
-                </div>
-
-                {/* GIZ Logo */}
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-red-600 leading-none">giz</div>
-                  <div className="text-[9px] text-gray-600 leading-tight max-w-[200px]">
-                    Deutsche Gesellschaft für
-                    <br />
-                    Internationale Zusammenarbeit (GIZ) GmbH
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Blue bottom border */}
-          <div className="bg-blue-500 h-1.5"></div>
-        </header>
+        <CustomNavbar />
 
         <div className="container mx-auto px-4 py-16">
           <div className={selectedCategory === "recaudacion" ? "max-w-7xl mx-auto" : "max-w-4xl mx-auto"}>
