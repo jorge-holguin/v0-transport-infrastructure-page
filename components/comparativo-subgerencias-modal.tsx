@@ -65,10 +65,10 @@ export function ComparativoSubgerenciasModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] h-[100vh] md:h-[85vh] overflow-x-hidden overflow-y-auto flex flex-col p-3 md:p-4 lg:p-6"
+        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] max-h-[100vh] md:max-h-[90vh] overflow-y-auto p-0 flex flex-col"
         style={{ maxWidth: '100vw', width: '100vw' }}
       >
-        <DialogHeader className="border-b pb-4">
+        <DialogHeader className="border-b pb-4 px-3 md:px-4 lg:px-6 pt-3 md:pt-4 lg:pt-6">
           <div className="flex items-center justify-between">
             <button
               onClick={onClose}
@@ -94,7 +94,7 @@ export function ComparativoSubgerenciasModal({
         </DialogHeader>
 
         {/* Contenido principal en layout horizontal */}
-        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+        <div className="overflow-y-auto px-3 md:px-4 lg:px-6 pb-3 md:pb-4 lg:pb-6">
           {/* Total destacado - compacto */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-4">
             <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export function ComparativoSubgerenciasModal({
           </div>
 
           {/* Layout: Gráfico de Barras + Leyenda */}
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
+          <div className="flex flex-col gap-4">
             {/* Gráfico de Barras Horizontales */}
             <div className="bg-white p-4 lg:p-6 rounded-xl border border-gray-200 shadow-sm">
               <h4 className="text-xs lg:text-sm font-semibold text-gray-700 mb-3 lg:mb-4 flex items-center gap-2">
