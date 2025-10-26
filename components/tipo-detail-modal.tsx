@@ -30,7 +30,7 @@ const CHART_COLORS = [
 ]
 
 // Componente de gráfico de torta para Nivel 3
-function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], metrica: "soles" | "cantidad" }) {
+function SubtipoPieChart({ subtipos, metrica, tipo }: { subtipos: SubtipoDetalle[], metrica: "soles" | "cantidad", tipo: string }) {
   const total = subtipos.reduce((sum, subtipo) => {
     const value = metrica === "soles" ? (subtipo.soles || 0) : (subtipo.cantidad || 0)
     return sum + value
@@ -65,32 +65,61 @@ function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], me
     return `${seg.color} ${seg.startAngle}deg ${seg.endAngle}deg`
   }).join(', ')
 
+  const isInfracciones = tipo.toLowerCase().includes("infracciones")
+  const totalCantidad = subtipos.reduce((sum, subtipo) => sum + (subtipo.cantidad || 0), 0)
+
   return (
-    <div className="flex flex-col items-center gap-3 w-full">
-      {/* Gráfico circular - más pequeño en móvil */}
-      <div className="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 flex-shrink-0">
-        <div 
-          className="w-full h-full rounded-full shadow-2xl"
-          style={{
-            background: `conic-gradient(from 0deg, ${gradientStops})`
-          }}
-        />
+    <div className="flex flex-col lg:flex-row items-center gap-6 w-full">
+      {/* Gráfico circular - donut para infracciones */}
+      <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 flex-shrink-0">
+        {isInfracciones ? (
+          <>
+            {/* Donut Chart con centro hueco */}
+            <div 
+              className="w-full h-full rounded-full shadow-2xl"
+              style={{
+                background: `conic-gradient(from 0deg, ${gradientStops})`
+              }}
+            />
+            {/* Centro blanco con texto */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-white rounded-full shadow-inner flex flex-col items-center justify-center">
+              <p className="text-xs md:text-sm text-gray-600 font-medium mb-1">Infracciones de transportes</p>
+              <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">{totalCantidad}</p>
+            </div>
+          </>
+        ) : (
+          <div 
+            className="w-full h-full rounded-full shadow-2xl"
+            style={{
+              background: `conic-gradient(from 0deg, ${gradientStops})`
+            }}
+          />
+        )}
       </div>
 
-      {/* Leyenda debajo - compacta para móvil */}
-      <div className="w-full max-w-md">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      {/* Leyenda al lado - lista vertical para infracciones */}
+      <div className="flex-1 w-full">
+        <div className={isInfracciones ? "space-y-2" : "grid grid-cols-1 md:grid-cols-2 gap-2"}>
           {segments.map((seg, index) => (
-            <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+            <div key={index} className={`flex items-start gap-3 ${isInfracciones ? 'bg-white p-3 rounded-lg border border-gray-200' : 'bg-gray-50 p-2 rounded-lg'}`}>
               <div 
-                className="w-4 h-4 rounded flex-shrink-0 shadow-md" 
+                className="w-4 h-4 rounded flex-shrink-0 shadow-md mt-0.5" 
                 style={{ backgroundColor: seg.color }}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-900 truncate leading-tight">{seg.subtipo.subtipo}</p>
-                <p className="text-xs text-gray-600 font-bold">
-                  {seg.percentage.toFixed(1)}%
+                <p className={`text-xs font-semibold text-gray-900 ${isInfracciones ? '' : 'truncate'} leading-tight`}>
+                  {seg.subtipo.subtipo}
                 </p>
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="text-sm text-gray-600 font-bold">
+                    {seg.percentage.toFixed(2)}%
+                  </p>
+                  {isInfracciones && (
+                    <p className="text-xs text-gray-500">
+                      {seg.subtipo.cantidad} unidades
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -178,7 +207,7 @@ export function TipoDetailModal({
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
                 <span>Distribución por Subtipo</span>
               </h4>
-              <SubtipoPieChart subtipos={subtipos} metrica={metrica} />
+              <SubtipoPieChart subtipos={subtipos} metrica={metrica} tipo={tipo} />
             </div>
 
             {/* Detalles por subtipo - grid compacto */}

@@ -294,10 +294,24 @@ export default function Home() {
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
-                            totalSoles={195000}
-                            totalCantidad={2850}
+                            totalSoles={447304.84}
+                            totalCantidad={4680}
                             icon={<Users className="w-6 h-6" />}
                             detalles={[
+                              { 
+                                tipo: "Infracciones de transporte 2025", 
+                                soles: 252304.84, 
+                                cantidad: 1830,
+                                subtipos: [
+                                  { subtipo: "Prestar el servicio en un vehículo no habilitado - Muy Grave", soles: 164500, cantidad: 1194 },
+                                  { subtipo: "Por estacionarse en zonas prohibidas (paraderos informales, cruceros peatonales y zonas rígidas) - Muy Grave", soles: 10730, cantidad: 280 },
+                                  { subtipo: "PRESTAR SEVICIO DE TRANSPORTES DE PERSONAS SIN CONTAR CON AUTORIZACION MUNICIPAL", soles: 31300, cantidad: 227 },
+                                  { subtipo: "POR UTILIZAR LA VIA PUBLICA COMO PARADERO", soles: 11900, cantidad: 78 },
+                                  { subtipo: "CIRCULAR CON UNIDADES VEHICULARES SIN LOS ELEMENTOS DE IDENTIFICACION DEL SERVICIO DE TAXI", soles: 6400, cantidad: 42 },
+                                  { subtipo: "Prohibir el tránsito y estacionamiento de vehículos cuatrimotos en las zonas urbanas en el ámbito de la Provincia de Piura y la red vial provincial RESPONSABLE: PROPIETARIO. GRAVEDAD:", soles: 750, cantidad: 5 },
+                                  { subtipo: "Otros", soles: 600, cantidad: 4 }
+                                ]
+                              },
                               { 
                                 tipo: "Licencia Conducir Clase B-IIB", 
                                 soles: 140000, 
