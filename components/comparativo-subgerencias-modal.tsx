@@ -61,7 +61,7 @@ export function ComparativoSubgerenciasModal({
       brecha
     }
   })
-
+ 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
@@ -93,7 +93,7 @@ export function ComparativoSubgerenciasModal({
           </div>
         </DialogHeader>
 
-        {/* Contenido principal en layout horizontal */}
+        {/* Contenido principal en layout l */}
         <div className="overflow-y-auto px-3 md:px-4 lg:px-6 pb-3 md:pb-4 lg:pb-6">
           {/* Total destacado - compacto */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-4">
