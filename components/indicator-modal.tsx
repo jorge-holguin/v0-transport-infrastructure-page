@@ -52,8 +52,8 @@ export function IndicatorModal({
           </div>
         </Card>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="border-b pb-4">
+      <DialogContent className="max-w-3xl !max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="border-b pb-4 px-6 pt-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full">{id}</span>
@@ -68,6 +68,7 @@ export function IndicatorModal({
           </div>
         </DialogHeader>
 
+        <div className="overflow-y-auto flex-1 px-6 pb-6">
         <div className="space-y-6 pt-4">
           {/* Descripción */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
@@ -139,6 +140,7 @@ export function IndicatorModal({
               </div>
             </div>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

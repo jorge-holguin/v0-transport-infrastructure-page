@@ -65,7 +65,7 @@ export function ComparativoSubgerenciasModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] max-h-[100vh] md:max-h-[90vh] overflow-y-auto p-0 flex flex-col"
+        className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] !max-h-[90vh] p-0 flex flex-col"
         style={{ maxWidth: '100vw', width: '100vw' }}
       >
         <DialogHeader className="border-b pb-4 px-3 md:px-4 lg:px-6 pt-3 md:pt-4 lg:pt-6">
