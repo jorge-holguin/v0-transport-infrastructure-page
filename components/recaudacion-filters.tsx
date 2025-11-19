@@ -8,6 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 interface RecaudacionFiltersProps {
   selectedYear: string
   onYearChange: (year: string) => void
+  selectedMonth: string
+  onMonthChange: (month: string) => void
   selectedEstado: string
   onEstadoChange: (estado: string) => void
   selectedMetrica: "soles" | "cantidad"
@@ -20,6 +22,8 @@ interface RecaudacionFiltersProps {
 export function RecaudacionFilters({
   selectedYear,
   onYearChange,
+  selectedMonth,
+  onMonthChange,
   selectedEstado,
   onEstadoChange,
   selectedMetrica,
@@ -73,51 +77,46 @@ export function RecaudacionFilters({
             </Select>
           </div>
 
-          {/* Estado de Recaudación */}
+          {/* Mes */}
           <div>
             <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <Filter className="w-4 h-4 text-blue-600" />
-              Estado de Recaudación
+              <Calendar className="w-4 h-4 text-blue-600" />
+              Mes
             </label>
-            <Select value={selectedEstado} onValueChange={onEstadoChange}>
+            <Select value={selectedMonth} onValueChange={onMonthChange}>
               <SelectTrigger className="bg-white border-blue-300 hover:border-blue-500 transition-colors">
-                <SelectValue placeholder="Seleccionar estado" />
+                <SelectValue placeholder="Seleccionar mes" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="Cobradas">Cobradas</SelectItem>
-                <SelectItem value="Por cobrar">Por cobrar</SelectItem>
-                <SelectItem value="Por ejecutar">Por ejecutar</SelectItem>
+                <SelectItem value="enero">Enero</SelectItem>
+                <SelectItem value="febrero">Febrero</SelectItem>
+                <SelectItem value="marzo">Marzo</SelectItem>
+                <SelectItem value="abril">Abril</SelectItem>
+                <SelectItem value="mayo">Mayo</SelectItem>
+                <SelectItem value="junio">Junio</SelectItem>
+                <SelectItem value="julio">Julio</SelectItem>
+                <SelectItem value="agosto">Agosto</SelectItem>
+                <SelectItem value="septiembre">Septiembre</SelectItem>
+                <SelectItem value="octubre">Octubre</SelectItem>
+                <SelectItem value="noviembre">Noviembre</SelectItem>
+                <SelectItem value="diciembre">Diciembre</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Métrica - Toggle */}
+          {/* Métrica - Only Soles */}
           <div>
             <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-blue-600" />
-              Métrica
+              Métrica (Soles)
             </label>
             <div className="flex gap-2">
               <button
-                onClick={() => onMetricaChange("soles")}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                  selectedMetrica === "soles"
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-blue-300 hover:border-blue-500"
-                }`}
+                disabled
+                className="flex-1 px-4 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow-md cursor-default"
               >
                 Soles (S/)
-              </button>
-              <button
-                onClick={() => onMetricaChange("cantidad")}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                  selectedMetrica === "cantidad"
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-white text-gray-700 border border-blue-300 hover:border-blue-500"
-                }`}
-              >
-                Cantidad
               </button>
             </div>
           </div>

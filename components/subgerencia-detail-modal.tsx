@@ -137,6 +137,9 @@ export function SubgerenciaDetailModal({
   const [showNivel3, setShowNivel3] = useState(false)
   const [currentMetrica, setCurrentMetrica] = useState<"soles" | "cantidad">(metrica)
 
+  // Check if soles data is available
+  const hasSolesData = totalSoles !== undefined && totalSoles > 0
+
   const handleTipoClick = (detalle: DetalleNivel2) => {
     if (detalle.subtipos && detalle.subtipos.length > 0) {
       setSelectedTipo(detalle)
@@ -178,33 +181,35 @@ export function SubgerenciaDetailModal({
             </div>
           </div>
           
-          {/* Toggle de Métrica */}
-          <div className="mt-4 flex justify-end">
-            <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
-              <button
-                onClick={() => setCurrentMetrica("soles")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  currentMetrica === "soles"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-gray-700 hover:text-gray-900"
-                }`}
-              >
-                <DollarSign className="w-4 h-4 inline mr-1" />
-                Soles (S/)
-              </button>
-              <button
-                onClick={() => setCurrentMetrica("cantidad")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  currentMetrica === "cantidad"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-gray-700 hover:text-gray-900"
-                }`}
-              >
-                <Hash className="w-4 h-4 inline mr-1" />
-                Cantidad
-              </button>
+          {/* Toggle de Métrica - Only show if soles data is available */}
+          {hasSolesData && (
+            <div className="mt-4 flex justify-end">
+              <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+                <button
+                  onClick={() => setCurrentMetrica("soles")}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                    currentMetrica === "soles"
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                >
+                  <DollarSign className="w-4 h-4 inline mr-1" />
+                  Soles (S/)
+                </button>
+                <button
+                  onClick={() => setCurrentMetrica("cantidad")}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                    currentMetrica === "cantidad"
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                >
+                  <Hash className="w-4 h-4 inline mr-1" />
+                  Cantidad
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </DialogHeader>
 
         {/* Contenido principal en layout horizontal */}
@@ -233,15 +238,6 @@ export function SubgerenciaDetailModal({
 
           {/* Layout vertical para móvil, horizontal para desktop */}
           <div className="flex flex-col gap-4">
-            {/* Gráfico de Torta */}
-            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
-              <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 justify-center">
-                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
-                <span>Distribución {currentMetrica === "soles" ? "de Recaudación" : "de Cantidad"}</span>
-              </h4>
-              <PieChart detalles={detalles} metrica={currentMetrica} />
-            </div>
-
             {/* Detalles por tipo - grid compacto */}
             <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
               <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -289,6 +285,15 @@ export function SubgerenciaDetailModal({
                     </Card>
                   ))}
                 </div>
+            </div>
+
+            {/* Gráfico de Torta */}
+            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+              <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 justify-center">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
+                <span>Distribución {currentMetrica === "soles" ? "de Recaudación" : "de Cantidad"}</span>
+              </h4>
+              <PieChart detalles={detalles} metrica={currentMetrica} />
             </div>
 
             {/* Sección Recaudado Hasta la Fecha - solo para Tránsito y Movilidad Urbana */}

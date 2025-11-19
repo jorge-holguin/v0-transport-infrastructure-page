@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { useState } from "react"
 import { DollarSign, Hash, TrendingUp } from "lucide-react"
 import { SubgerenciaDetailModal } from "./subgerencia-detail-modal"
+import { TipoDetailModal } from "./tipo-detail-modal"
 
 interface SubtipoDetalle {
   subtipo: string
@@ -41,9 +42,14 @@ export function SubgerenciaCard({
 }: SubgerenciaCardProps) {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-  const displayValue = metrica === "soles" 
-    ? `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-    : `${(totalCantidad || 0).toLocaleString('es-PE')}`
+  // Check if soles data is available
+  const hasSolesData = totalSoles !== undefined && totalSoles > 0
+  
+  const displayValue = !hasSolesData || metrica === "cantidad"
+    ? `${(totalCantidad || 0).toLocaleString('es-PE')}`
+    : `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+
+  const hasSingleTipo = detalles.length === 1
 
   const handleClick = () => {
     setIsDetailOpen(true)
@@ -73,25 +79,25 @@ export function SubgerenciaCard({
           {/* Valor principal */}
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              {metrica === "soles" ? (
-                <>
-                  <DollarSign className="w-3 h-3" />
-                  <span>Recaudación</span>
-                </>
-              ) : (
+              {!hasSolesData || metrica === "cantidad" ? (
                 <>
                   <Hash className="w-3 h-3" />
                   <span>Cantidad</span>
+                </>
+              ) : (
+                <>
+                  <DollarSign className="w-3 h-3" />
+                  <span>Recaudación</span>
                 </>
               )}
             </div>
             <p className="text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors">
               {displayValue}
             </p>
-            {metrica === "soles" && totalCantidad && (
+            {hasSolesData && metrica === "soles" && totalCantidad && (
               <p className="text-xs text-gray-500">{totalCantidad.toLocaleString('es-PE')} trámites</p>
             )}
-            {metrica === "cantidad" && totalSoles && (
+            {metrica === "cantidad" && hasSolesData && totalSoles && (
               <p className="text-xs text-gray-500">S/ {totalSoles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             )}
           </div>
@@ -110,17 +116,32 @@ export function SubgerenciaCard({
         </div>
       </Card>
 
-      <SubgerenciaDetailModal
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-        subgerencia={nombre}
-        year={year}
-        metrica={metrica}
-        estado={estado}
-        detalles={detalles}
-        totalSoles={totalSoles}
-        totalCantidad={totalCantidad}
-      />
+      {hasSingleTipo ? (
+        <TipoDetailModal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          subgerencia={nombre}
+          tipo={detalles[0].tipo}
+          year={year}
+          metrica={metrica}
+          estado={estado}
+          subtipos={detalles[0].subtipos || []}
+          totalSoles={detalles[0].soles ?? totalSoles}
+          totalCantidad={detalles[0].cantidad ?? totalCantidad}
+        />
+      ) : (
+        <SubgerenciaDetailModal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          subgerencia={nombre}
+          year={year}
+          metrica={metrica}
+          estado={estado}
+          detalles={detalles}
+          totalSoles={totalSoles}
+          totalCantidad={totalCantidad}
+        />
+      )}
     </>
   )
 }

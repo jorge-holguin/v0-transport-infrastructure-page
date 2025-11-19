@@ -11,23 +11,24 @@ import { RecaudacionFilters } from "@/components/recaudacion-filters"
 import { ComparativoSubgerenciasModal } from "@/components/comparativo-subgerencias-modal"
 import { Building, Users, ShieldCheck, GraduationCap, BarChart3 } from "lucide-react"
 import { CustomNavbar } from "@/components/custom-navbar"
+import { TipoDetailModal } from "@/components/tipo-detail-modal"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   
   // Estados para filtros de recaudación
   const [selectedYear, setSelectedYear] = useState("2024")
+  const [selectedMonth, setSelectedMonth] = useState("Todos")
   const [selectedEstado, setSelectedEstado] = useState("Todos")
   const [selectedMetrica, setSelectedMetrica] = useState<"soles" | "cantidad">("soles")
   const [selectedSubgerencias, setSelectedSubgerencias] = useState<string[]>([
     "Subgerencia de Transportes",
     "Subgerencia de Fiscalización",
-    "Subgerencia de Tránsito y Movilidad Urbana",
-    "Subgerencia de Seguridad y Educación Vial"
+    "Subgerencia de Tránsito y Movilidad Urbana"
   ])
   const [showComparativo, setShowComparativo] = useState(false)
 
-  // Datos para el gráfico comparativo con avance y meta
+  // Datos para el gráfico comparativo con avance y meta (solo recaudación)
   const subgerenciasData = [
     { 
       nombre: "Subgerencia de Transportes", 
@@ -52,14 +53,6 @@ export default function Home() {
       metaSoles: 220000, 
       metaCantidad: 3200, 
       color: "#10b981" 
-    },
-    { 
-      nombre: "Subgerencia de Seguridad y Educación Vial", 
-      soles: 45000, 
-      cantidad: 450, 
-      metaSoles: 60000, 
-      metaCantidad: 600, 
-      color: "#8b5cf6" 
     }
   ]
 
@@ -75,22 +68,73 @@ export default function Home() {
         <CustomNavbar />
 
         <div className="container mx-auto px-4 py-16">
-          <div className={selectedCategory === "recaudacion" ? "max-w-7xl mx-auto" : "max-w-4xl mx-auto"}>
+          <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-5xl mx-auto"}>
             {!selectedCategory ? (
-              // Main Category Selection
-              <div className="flex justify-center">
+              // Main Category Selection - 4 Categories
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                 <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group max-w-md w-full"
+                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
                   onClick={() => setSelectedCategory("recaudacion")}
                 >
-                  <div className="p-12 flex flex-col items-center text-center gap-6">
-                    <CreditCard className="w-24 h-24 text-blue-600 group-hover:text-white transition-colors" />
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <CreditCard className="w-16 h-16 text-blue-600 group-hover:text-white transition-colors" />
                     <div>
-                      <h3 className="font-bold text-2xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
                         Recaudación
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
-                        Montos totales recaudados por autorizaciones, brevetes e intervenciones
+                        Montos totales recaudados por subgerencias
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card
+                  className="bg-white/95 backdrop-blur-sm hover:bg-green-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedCategory("capacitacion")}
+                >
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <GraduationCap className="w-16 h-16 text-green-600 group-hover:text-white transition-colors" />
+                    <div>
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                        Capacitación
+                      </h3>
+                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+                        Capacitaciones viales realizadas
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card
+                  className="bg-white/95 backdrop-blur-sm hover:bg-purple-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedCategory("certificaciones")}
+                >
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <ShieldCheck className="w-16 h-16 text-purple-600 group-hover:text-white transition-colors" />
+                    <div>
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                        Certificaciones
+                      </h3>
+                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+                        Certificaciones emitidas
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card
+                  className="bg-white/95 backdrop-blur-sm hover:bg-orange-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedCategory("senalizaciones")}
+                >
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <Building className="w-16 h-16 text-orange-600 group-hover:text-white transition-colors" />
+                    <div>
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                        Señalizaciones
+                      </h3>
+                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+                        Señalización horizontal de vías
                       </p>
                     </div>
                   </div>
@@ -130,9 +174,10 @@ export default function Home() {
                         availableSubgerencias={[
                           "Subgerencia de Transportes",
                           "Subgerencia de Fiscalización",
-                          "Subgerencia de Tránsito y Movilidad Urbana",
-                          "Subgerencia de Seguridad y Educación Vial"
+                          "Subgerencia de Tránsito y Movilidad Urbana"
                         ]}
+                        selectedMonth={selectedMonth}
+                        onMonthChange={setSelectedMonth}
                       />
 
                       {/* Botón para ver gráfico comparativo */}
@@ -332,51 +377,10 @@ export default function Home() {
                                   { subtipo: "Duplicado", soles: 5000, cantidad: 50 }
                                 ]
                               },
-                              { 
-                                tipo: "Certificaciones", 
-                                soles: 0, 
-                                cantidad: 0,
-                                subtipos: [
-                                  { subtipo: "Emisiones", soles: 0, cantidad: 0 }
-                                ]
-                              },
-                              { 
-                                tipo: "Señalización Horizontal Vías", 
-                                soles: 0, 
-                                cantidad: 0,
-                                subtipos: [
-                                  { subtipo: "m2", soles: 0, cantidad: 0 },
-                                  { subtipo: "km", soles: 0, cantidad: 0 }
-                                ]
-                              }
                             ]}
                           />
                         )}
 
-                        {/* Subgerencia de Seguridad y Educación Vial */}
-                        {selectedSubgerencias.includes("Subgerencia de Seguridad y Educación Vial") && (
-                          <SubgerenciaCard
-                            nombre="Subgerencia de Seguridad y Educación Vial"
-                            year={selectedYear}
-                            metrica={selectedMetrica}
-                            estado={selectedEstado}
-                            totalSoles={45000}
-                            totalCantidad={450}
-                            icon={<GraduationCap className="w-6 h-6" />}
-                            detalles={[
-                              { 
-                                tipo: "Capacitación Vial", 
-                                soles: 45000, 
-                                cantidad: 450,
-                                subtipos: [
-                                  { subtipo: "Capacitación para Vehículos menores", soles: 18000, cantidad: 180 },
-                                  { subtipo: "Capacitación para Taxi", soles: 15000, cantidad: 150 },
-                                  { subtipo: "Capacitación para Transporte urbano", soles: 12000, cantidad: 120 }
-                                ]
-                              }
-                            ]}
-                          />
-                        )}
                       </div>
                     </Card>
 
@@ -389,6 +393,57 @@ export default function Home() {
                       subgerencias={subgerenciasData}
                     />
                   </div>
+                )}
+
+                {selectedCategory === "capacitacion" && (
+                  <TipoDetailModal
+                    isOpen={true}
+                    onClose={() => setSelectedCategory(null)}
+                    subgerencia="Subgerencia de Seguridad y Educación Vial"
+                    tipo="Capacitación Vial"
+                    year={selectedYear}
+                    metrica="cantidad"
+                    estado={selectedEstado}
+                    subtipos={[
+                      { subtipo: "Capacitación para Vehículos menores", cantidad: 18000 },
+                      { subtipo: "Capacitación para Taxi", cantidad: 7200 },
+                      { subtipo: "Capacitación para Transporte urbano", cantidad: 5400 }
+                    ]}
+                    totalCantidad={30600}
+                  />
+                )}
+
+                {selectedCategory === "certificaciones" && (
+                  <TipoDetailModal
+                    isOpen={true}
+                    onClose={() => setSelectedCategory(null)}
+                    subgerencia="Subgerencia de Tránsito y Movilidad Urbana"
+                    tipo="Certificaciones"
+                    year={selectedYear}
+                    metrica="cantidad"
+                    estado={selectedEstado}
+                    subtipos={[
+                      { subtipo: "Emisiones", cantidad: 18000 }
+                    ]}
+                    totalCantidad={18000}
+                  />
+                )}
+
+                {selectedCategory === "senalizaciones" && (
+                  <TipoDetailModal
+                    isOpen={true}
+                    onClose={() => setSelectedCategory(null)}
+                    subgerencia="Subgerencia de Tránsito y Movilidad Urbana"
+                    tipo="Señalización Horizontal Vías"
+                    year={selectedYear}
+                    metrica="cantidad"
+                    estado={selectedEstado}
+                    subtipos={[
+                      { subtipo: "m2", cantidad: 5 },
+                      { subtipo: "km", cantidad: 30 }
+                    ]}
+                    totalCantidad={35}
+                  />
                 )}
 
                 {selectedCategory === "permisos" && (

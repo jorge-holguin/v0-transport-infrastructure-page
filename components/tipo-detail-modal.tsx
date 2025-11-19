@@ -112,6 +112,9 @@ export function TipoDetailModal({
   totalSoles,
   totalCantidad
 }: TipoDetailModalProps) {
+  // Check if soles data is available
+  const hasSolesData = totalSoles !== undefined && totalSoles > 0
+  
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
@@ -153,34 +156,25 @@ export function TipoDetailModal({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-purple-100 text-xs font-medium mb-1">
-                  {metrica === "soles" ? "Total Recaudación" : "Total Cantidad"}
+                  {!hasSolesData ? "Total Cantidad" : metrica === "soles" ? "Total Recaudación" : "Total Cantidad"}
                 </p>
                 <p className="text-2xl font-bold">
-                  {metrica === "soles" 
-                    ? `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-                    : `${(totalCantidad || 0).toLocaleString('es-PE')} unidades`
+                  {!hasSolesData || metrica === "cantidad"
+                    ? `${(totalCantidad || 0).toLocaleString('es-PE')} unidades`
+                    : `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
                   }
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <div><span className="font-semibold">Año:</span> {year}</div>
                 <div><span className="font-semibold">Estado:</span> {estado}</div>
-                <div><span className="font-semibold">Métrica:</span> {metrica === "soles" ? "Soles" : "Cantidad"}</div>
+                {hasSolesData && <div><span className="font-semibold">Métrica:</span> {metrica === "soles" ? "Soles" : "Cantidad"}</div>}
               </div>
             </div>
           </div>
 
           {/* Layout vertical para móvil */}
           <div className="flex flex-col gap-4">
-            {/* Gráfico de Torta */}
-            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
-              <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 justify-center">
-                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
-                <span>Distribución por Subtipo</span>
-              </h4>
-              <SubtipoPieChart subtipos={subtipos} metrica={metrica} />
-            </div>
-
             {/* Detalles por subtipo - grid compacto */}
             <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
               <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -194,28 +188,26 @@ export function TipoDetailModal({
                       <div className="space-y-1">
                         <h5 className="font-semibold text-gray-900 text-xs leading-tight">{subtipo.subtipo}</h5>
                         <div className="flex flex-col gap-0.5">
-                          {metrica === "soles" && subtipo.soles !== undefined && (
+                          {!hasSolesData || metrica === "cantidad" ? (
                             <>
                               <span className="text-lg font-bold text-purple-600">
-                                S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </span>
-                              {subtipo.cantidad !== undefined && (
-                                <span className="text-xs text-gray-500">
-                                  {subtipo.cantidad} unidades
-                                </span>
-                              )}
-                            </>
-                          )}
-                          {metrica === "cantidad" && subtipo.cantidad !== undefined && (
-                            <>
-                              <span className="text-lg font-bold text-purple-600">
-                                {subtipo.cantidad.toLocaleString('es-PE')}
+                                {(subtipo.cantidad || 0).toLocaleString('es-PE')}
                               </span>
                               <span className="text-xs text-gray-500">unidades</span>
-                              {subtipo.soles !== undefined && (
-                                <span className="text-xs text-gray-500">
-                                  S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                                </span>
+                            </>
+                          ) : (
+                            <>
+                              {metrica === "soles" && subtipo.soles !== undefined && (
+                                <>
+                                  <span className="text-lg font-bold text-purple-600">
+                                    S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </span>
+                                  {subtipo.cantidad !== undefined && (
+                                    <span className="text-xs text-gray-500">
+                                      {subtipo.cantidad} unidades
+                                    </span>
+                                  )}
+                                </>
                               )}
                             </>
                           )}
@@ -224,6 +216,15 @@ export function TipoDetailModal({
                     </Card>
                   ))}
                 </div>
+            </div>
+
+            {/* Gráfico de Torta */}
+            <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+              <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 justify-center">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
+                <span>Distribución por Subtipo</span>
+              </h4>
+              <SubtipoPieChart subtipos={subtipos} metrica={metrica} />
             </div>
           </div>
         </div>
