@@ -2,8 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
-import { Calendar, Filter, DollarSign, Building2 } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Calendar, Filter, DollarSign } from "lucide-react"
 
 interface RecaudacionFiltersProps {
   selectedYear: string
@@ -32,23 +31,6 @@ export function RecaudacionFilters({
   onSubgerenciasChange,
   availableSubgerencias
 }: RecaudacionFiltersProps) {
-  
-  const toggleSubgerencia = (subgerencia: string) => {
-    if (selectedSubgerencias.includes(subgerencia)) {
-      onSubgerenciasChange(selectedSubgerencias.filter(s => s !== subgerencia))
-    } else {
-      onSubgerenciasChange([...selectedSubgerencias, subgerencia])
-    }
-  }
-
-  const selectAllSubgerencias = () => {
-    if (selectedSubgerencias.length === availableSubgerencias.length) {
-      onSubgerenciasChange([])
-    } else {
-      onSubgerenciasChange(availableSubgerencias)
-    }
-  }
-
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-2 border-blue-200 shadow-lg">
       <div className="space-y-6">
@@ -120,41 +102,6 @@ export function RecaudacionFilters({
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Subgerencias - Multi-select */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-blue-600" />
-              Subgerencias
-            </label>
-            <button
-              onClick={selectAllSubgerencias}
-              className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
-            >
-              {selectedSubgerencias.length === availableSubgerencias.length ? "Deseleccionar todas" : "Seleccionar todas"}
-            </button>
-          </div>
-          <Card className="bg-white p-4 border border-blue-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {availableSubgerencias.map((subgerencia) => (
-                <div key={subgerencia} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={subgerencia}
-                    checked={selectedSubgerencias.includes(subgerencia)}
-                    onCheckedChange={() => toggleSubgerencia(subgerencia)}
-                  />
-                  <label
-                    htmlFor={subgerencia}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {subgerencia}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
       </div>
     </Card>

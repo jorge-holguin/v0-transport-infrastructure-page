@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { useState } from "react"
 import { DollarSign, Hash, TrendingUp } from "lucide-react"
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 import { SubgerenciaDetailModal } from "./subgerencia-detail-modal"
 import { TipoDetailModal } from "./tipo-detail-modal"
 
@@ -26,6 +27,8 @@ interface SubgerenciaCardProps {
   estado: string
   totalSoles?: number
   totalCantidad?: number
+  metaSoles?: number
+  metaCantidad?: number
   detalles: DetalleNivel2[]
   icon?: React.ReactNode
 }
@@ -37,6 +40,8 @@ export function SubgerenciaCard({
   estado,
   totalSoles,
   totalCantidad,
+  metaSoles,
+  metaCantidad,
   detalles,
   icon
 }: SubgerenciaCardProps) {
@@ -50,6 +55,26 @@ export function SubgerenciaCard({
     : `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
 
   const hasSingleTipo = detalles.length === 1
+
+  // Datos para gráfico de torta Recaudado vs Por recaudar (mismo criterio que ComparativoSubgerenciasModal)
+  const metaValue = metrica === "soles" ? metaSoles : metaCantidad
+  const avanceValue = metrica === "soles" ? totalSoles : totalCantidad
+  const hasMetaData = metaValue !== undefined && metaValue > 0 && avanceValue !== undefined && avanceValue >= 0
+
+  const recaudadoValue = hasMetaData ? avanceValue ?? 0 : 0
+  const porRecaudarValue = hasMetaData ? Math.max((metaValue ?? 0) - recaudadoValue, 0) : 0
+
+  const pieData = hasMetaData
+    ? [
+        { name: "Recaudado", value: recaudadoValue },
+        { name: "Por recaudar", value: porRecaudarValue }
+      ]
+    : []
+
+  const recaudadoPercent = hasMetaData && metaValue
+    ? Math.min(Math.round((recaudadoValue / metaValue) * 100), 100)
+    : 0
+  const porRecaudarPercent = hasMetaData ? Math.max(100 - recaudadoPercent, 0) : 0
 
   const handleClick = () => {
     setIsDetailOpen(true)
@@ -94,13 +119,50 @@ export function SubgerenciaCard({
             <p className="text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors">
               {displayValue}
             </p>
-            {hasSolesData && metrica === "soles" && totalCantidad && (
+            {hasSolesData && metrica === "soles" && !!totalCantidad && (
               <p className="text-xs text-gray-500">{totalCantidad.toLocaleString('es-PE')} trámites</p>
             )}
-            {metrica === "cantidad" && hasSolesData && totalSoles && (
+            {metrica === "cantidad" && hasSolesData && !!totalSoles && (
               <p className="text-xs text-gray-500">S/ {totalSoles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             )}
           </div>
+
+          {/* Gráfico de torta Recaudado vs Por recaudar */}
+          {hasMetaData && (
+            <div className="mt-4 flex items-center gap-4">
+              <div className="w-24 h-24">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={24}
+                      outerRadius={40}
+                      stroke="transparent"
+                    >
+                      <Cell key="recaudado" fill="#16a34a" />
+                      <Cell key="por-recaudar" fill="#f97316" />
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="text-xs space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-green-500" />
+                  <span>
+                    Recaudado: {recaudadoPercent}%
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-orange-500" />
+                  <span>
+                    Por recaudar: {porRecaudarPercent}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Footer con info adicional */}
           <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs">

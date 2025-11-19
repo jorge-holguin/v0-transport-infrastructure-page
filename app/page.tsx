@@ -2,16 +2,17 @@
 
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import { CreditCard, ClipboardCheck } from "lucide-react"
+import { CreditCard, ClipboardCheck, TrendingUp, PieChart as PieChartIcon } from "lucide-react"
 import { IndicatorModal } from "@/components/indicator-modal"
 import { RecaudacionCard } from "@/components/recaudacion-card"
 import { PermisoCard } from "@/components/permiso-card"
 import { SubgerenciaCard } from "@/components/subgerencia-card"
 import { RecaudacionFilters } from "@/components/recaudacion-filters"
-import { ComparativoSubgerenciasModal } from "@/components/comparativo-subgerencias-modal"
-import { Building, Users, ShieldCheck, GraduationCap, BarChart3 } from "lucide-react"
+import { Building, Users, ShieldCheck, GraduationCap } from "lucide-react"
 import { CustomNavbar } from "@/components/custom-navbar"
 import { TipoDetailModal } from "@/components/tipo-detail-modal"
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -26,35 +27,77 @@ export default function Home() {
     "Subgerencia de Fiscalización",
     "Subgerencia de Tránsito y Movilidad Urbana"
   ])
-  const [showComparativo, setShowComparativo] = useState(false)
+  const [tipoRecaudacion, setTipoRecaudacion] = useState<"cobradas" | "por-cobrar">("cobradas")
 
   // Datos para el gráfico comparativo con avance y meta (solo recaudación)
   const subgerenciasData = [
     { 
       nombre: "Subgerencia de Transportes", 
-      soles: 285000, 
+      soles: 285000, // mismo totalSoles que la tarjeta de subgerencia
       cantidad: 1450, 
-      metaSoles: 400000, 
+      metaSoles: 400000, // misma metaSoles que la tarjeta
       metaCantidad: 2000, 
       color: "#3b82f6" 
     },
     { 
       nombre: "Subgerencia de Fiscalización", 
-      soles: 145000, 
+      soles: 145000, // mismo totalSoles que la tarjeta
       cantidad: 850, 
-      metaSoles: 180000, 
+      metaSoles: 180000, // misma metaSoles que la tarjeta
       metaCantidad: 1100, 
       color: "#f97316" 
     },
     { 
       nombre: "Subgerencia de Tránsito y Movilidad Urbana", 
-      soles: 195000, 
-      cantidad: 2850, 
-      metaSoles: 220000, 
-      metaCantidad: 3200, 
+      soles: 447304.84, // mismo totalSoles que la tarjeta de Tránsito
+      cantidad: 4680, 
+      metaSoles: 550000, // ajustar meta para que el cumplimiento sea < 100%
+      metaCantidad: 5200, 
       color: "#10b981" 
     }
   ]
+
+  // Totales generales para recaudado vs por recaudar (en soles)
+  // Usan exactamente los mismos montos y metas que las tarjetas de subgerencia
+  const totalAvance = subgerenciasData.reduce((sum, sub) => {
+    const value = sub.soles
+    const adjustedValue = tipoRecaudacion === "cobradas" ? value : value * 0.3
+    return sum + adjustedValue
+  }, 0)
+
+  const totalMeta = subgerenciasData.reduce((sum, sub) => sum + sub.metaSoles, 0)
+
+  const pieData = [
+    { name: "Recaudado", value: totalAvance },
+    { name: "Por Recaudar", value: Math.max(totalMeta - totalAvance, 0) }
+  ]
+
+  // Datos mensuales: se escalan para que la suma coincida con el total recaudado
+  // Distribución base proporcional para 11 meses (hasta noviembre)
+  const monthlyBaseData = [
+    { mes: "Enero", proporcion: 0.095 },
+    { mes: "Febrero", proporcion: 0.098 },
+    { mes: "Marzo", proporcion: 0.100 },
+    { mes: "Abril", proporcion: 0.097 },
+    { mes: "Mayo", proporcion: 0.095 },
+    { mes: "Junio", proporcion: 0.092 },
+    { mes: "Julio", proporcion: 0.090 },
+    { mes: "Agosto", proporcion: 0.088 },
+    { mes: "Septiembre", proporcion: 0.086 },
+    { mes: "Octubre", proporcion: 0.084 },
+    { mes: "Noviembre", proporcion: 0.075 },
+    { mes: "Diciembre", proporcion: 0.0 }
+  ]
+
+  const monthlyData = monthlyBaseData.map((item) => {
+    const recaudado = totalAvance * item.proporcion
+    const porRecaudar = (totalMeta * item.proporcion) - recaudado
+    return {
+      mes: item.mes,
+      recaudado: recaudado,
+      porRecaudar: Math.max(porRecaudar, 0)
+    }
+  })
 
   return (
     <main className="min-h-screen relative">
@@ -180,15 +223,178 @@ export default function Home() {
                         onMonthChange={setSelectedMonth}
                       />
 
-                      {/* Botón para ver gráfico comparativo */}
-                      <div className="mt-6 flex justify-center">
-                        <button
-                          onClick={() => setShowComparativo(true)}
-                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-3"
-                        >
-                          <BarChart3 className="w-6 h-6" />
-                          Ver Gráfico de Recaudación de las Subgerencias
-                        </button>
+                    </Card>
+
+                    {/* Gráfico Comparativo General */}
+                    <Card className="bg-white/95 backdrop-blur-sm p-8">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-6">
+                        Resumen General de Recaudación
+                      </h4>
+                      
+                      {/* Total destacado */}
+                      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-lg text-white shadow-lg mb-6">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                          <div className="flex gap-6">
+                            <div>
+                              <p className="text-blue-100 text-xs font-medium mb-1">Total Recaudado</p>
+                              <p className="text-2xl font-bold">
+                                S/ {totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-blue-100 text-xs font-medium mb-1">Total Por Recaudar</p>
+                              <p className="text-2xl font-bold">
+                                S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-blue-100 text-xs font-medium mb-1">Meta Total</p>
+                              <p className="text-2xl font-bold">
+                                S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-blue-100 text-xs font-medium mb-1">Cumplimiento</p>
+                              <p className="text-2xl font-bold">
+                                {(totalMeta > 0 ? ((totalAvance / totalMeta) * 100) : 0).toFixed(1)}%
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs">
+                            <div><span className="font-semibold">Año:</span> {selectedYear}</div>
+                            <div><span className="font-semibold">Métrica:</span> {selectedMetrica === "soles" ? "Soles (S/)" : "Cantidad"}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Selector de Tipo de Recaudación */}
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200 shadow-sm mb-6">
+                        <div className="flex items-center gap-4">
+                          <label className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                            Tipo de Recaudación:
+                          </label>
+                          <Select value={tipoRecaudacion} onValueChange={(value: "cobradas" | "por-cobrar") => setTipoRecaudacion(value)}>
+                            <SelectTrigger className="max-w-xs bg-white border-blue-300 hover:border-blue-500 transition-colors">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="cobradas">Cuentas Cobradas</SelectItem>
+                              <SelectItem value="por-cobrar">Cuentas por Cobrar</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Layout: Gráfico de Torta + Gráfico de Barras */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        {/* Gráfico de Torta General */}
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                          <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <PieChartIcon className="w-4 h-4 text-blue-600" />
+                            Recaudado vs Por Recaudar
+                          </h5>
+                          <div className="flex items-center gap-6">
+                            <div className="w-48 h-48">
+                              <ResponsiveContainer>
+                                <PieChart>
+                                  <Pie
+                                    data={pieData}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={50}
+                                    outerRadius={80}
+                                    labelLine={false}
+                                  >
+                                    <Cell fill="#16a34a" />
+                                    <Cell fill="#f97316" />
+                                  </Pie>
+                                </PieChart>
+                              </ResponsiveContainer>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-block w-4 h-4 rounded-full bg-green-500" />
+                                <span className="text-sm font-medium">Recaudado</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="inline-block w-4 h-4 rounded-full bg-orange-500" />
+                                <span className="text-sm font-medium">Por Recaudar</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Gráfico de Barras por Mes (Stacked: Recaudado + Por Recaudar) */}
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                          <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-blue-600" />
+                            Recaudación por Mes (Porcentajes)
+                          </h5>
+                          <div className="w-full h-64">
+                            <ResponsiveContainer>
+                              <BarChart data={monthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="mes" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" height={70} />
+                                <YAxis tick={{ fontSize: 12 }} />
+                                <Tooltip
+                                  formatter={(value) => `S/ ${(value as number).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`}
+                                />
+                                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                                <Bar dataKey="recaudado" stackId="a" fill="#16a34a" name="Recaudado" />
+                                <Bar dataKey="porRecaudar" stackId="a" fill="#f97316" name="Por Recaudar" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tabla de Recaudación por Mes */}
+                      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <h5 className="text-sm font-semibold text-gray-700 mb-4">Recaudación Mensual</h5>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-gray-200">
+                                <th className="text-left py-3 px-4 font-semibold text-gray-700">Mes</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Recaudado</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Por Recaudar</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {monthlyData.map((item, idx) => (
+                                <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                                  <td className="py-3 px-4 text-gray-700">{item.mes}</td>
+                                  <td className="py-3 px-4 text-right font-medium text-green-600">
+                                    S/ {item.recaudado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </td>
+                                  <td className="py-3 px-4 text-right font-medium text-orange-600">
+                                    S/ {item.porRecaudar.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </td>
+                                  <td className="py-3 px-4 text-right font-bold text-gray-900">
+                                    S/ {(item.recaudado + item.porRecaudar).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                            <tfoot>
+                              <tr className="border-t-2 border-gray-300 font-bold">
+                                <td className="py-3 px-4 text-gray-900">TOTAL</td>
+                                <td className="py-3 px-4 text-right text-green-600">
+                                  S/ {totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="py-3 px-4 text-right text-orange-600">
+                                  S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="py-3 px-4 text-right text-gray-900">
+                                  S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
                       </div>
                     </Card>
 
@@ -197,7 +403,7 @@ export default function Home() {
                       <h4 className="text-lg font-semibold text-gray-900 mb-6">
                         Nivel 1 - Resumen por Subgerencia
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Subgerencia de Fiscalización */}
                         {selectedSubgerencias.includes("Subgerencia de Fiscalización") && (
                           <SubgerenciaCard
@@ -207,6 +413,8 @@ export default function Home() {
                             estado={selectedEstado}
                             totalSoles={145000}
                             totalCantidad={850}
+                            metaSoles={180000}
+                            metaCantidad={1100}
                             icon={<ShieldCheck className="w-6 h-6" />}
                             detalles={[
                               { 
@@ -235,6 +443,8 @@ export default function Home() {
                             estado={selectedEstado}
                             totalSoles={285000}
                             totalCantidad={1450}
+                            metaSoles={400000}
+                            metaCantidad={2000}
                             icon={<Building className="w-6 h-6" />}
                             detalles={[
                               { 
@@ -341,6 +551,8 @@ export default function Home() {
                             estado={selectedEstado}
                             totalSoles={447304.84}
                             totalCantidad={4680}
+                            metaSoles={550000}
+                            metaCantidad={5200}
                             icon={<Users className="w-6 h-6" />}
                             detalles={[
                               { 
@@ -384,14 +596,6 @@ export default function Home() {
                       </div>
                     </Card>
 
-                    {/* Modal Comparativo */}
-                    <ComparativoSubgerenciasModal
-                      isOpen={showComparativo}
-                      onClose={() => setShowComparativo(false)}
-                      year={selectedYear}
-                      metrica={selectedMetrica}
-                      subgerencias={subgerenciasData}
-                    />
                   </div>
                 )}
 
