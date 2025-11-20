@@ -28,6 +28,8 @@ export default function Home() {
     "Subgerencia de Tránsito y Movilidad Urbana"
   ])
   const [tipoRecaudacion, setTipoRecaudacion] = useState<"cobradas" | "por-cobrar">("cobradas")
+  const [senalStep, setSenalStep] = useState<"subgerencia" | "horizontal" | "detalle">("subgerencia")
+  const [capStep, setCapStep] = useState<"subgerencia" | "detalle">("subgerencia")
 
   // Datos para el gráfico comparativo con avance y meta (solo recaudación)
   const subgerenciasData = [
@@ -99,6 +101,68 @@ export default function Home() {
     }
   })
 
+  // Datos de ejemplo para Señalización Horizontal (solo m²)
+  const senalizacionMensualData = [
+    { mes: "Enero", m2: 420 },
+    { mes: "Febrero", m2: 430 },
+    { mes: "Marzo", m2: 460 },
+    { mes: "Abril", m2: 480 },
+    { mes: "Mayo", m2: 440 },
+    { mes: "Junio", m2: 410 },
+    { mes: "Julio", m2: 400 },
+    { mes: "Agosto", m2: 390 },
+    { mes: "Septiembre", m2: 380 },
+    { mes: "Octubre", m2: 370 },
+    { mes: "Noviembre", m2: 360 },
+    { mes: "Diciembre", m2: 360 }
+  ]
+
+  const maxM2Mensual = Math.max(...senalizacionMensualData.map((i) => i.m2))
+
+  const senalizacionTiposData = [
+    { tipo: "Pasos peatonales", m2: 2000 },
+    { tipo: "Zonas rígidas", m2: 1500 },
+    { tipo: "Líneas continuas", m2: 900 },
+    { tipo: "Líneas discontinuas", m2: 600 }
+  ]
+
+  const maxM2Tipo = Math.max(...senalizacionTiposData.map((i) => i.m2))
+
+  // Datos de ejemplo para Capacitación
+  const totalCapacitaciones = 30600
+
+  const capacitacionPorModo = [
+    { modo: "Vehículos menores", cantidad: 18000 },
+    { modo: "Taxi", cantidad: 7200 },
+    { modo: "Transporte urbano", cantidad: 5400 }
+  ]
+
+  const capacitacionMensualData = [
+    { mes: "Enero", choferes: 2600 },
+    { mes: "Febrero", choferes: 2700 },
+    { mes: "Marzo", choferes: 2800 },
+    { mes: "Abril", choferes: 2550 },
+    { mes: "Mayo", choferes: 2500 },
+    { mes: "Junio", choferes: 2450 },
+    { mes: "Julio", choferes: 2400 },
+    { mes: "Agosto", choferes: 2350 },
+    { mes: "Septiembre", choferes: 2300 },
+    { mes: "Octubre", choferes: 2250 },
+    { mes: "Noviembre", choferes: 2200 },
+    { mes: "Diciembre", choferes: 2150 }
+  ]
+
+  const maxChoferesMensual = Math.max(...capacitacionMensualData.map((i) => i.choferes))
+
+  const capacitacionTemasData = [
+    { tema: "Seguridad vial", choferes: 12000 },
+    { tema: "Protocolo de acoso sexual (buses)", choferes: 8000 },
+    { tema: "Cumplimiento de ordenanzas municipales", choferes: 6000 },
+    { tema: "Respeto cívica", choferes: 4600 }
+  ]
+
+  const maxChoferesTema = Math.max(...capacitacionTemasData.map((i) => i.choferes))
+
   return (
     <main className="min-h-screen relative">
       {/* Background Image */}
@@ -113,10 +177,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-16">
           <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-5xl mx-auto"}>
             {!selectedCategory ? (
-              // Main Category Selection - 4 Categories
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+              // Main Category Selection - 3 Categories
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
                 <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  className="w-full bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
                   onClick={() => setSelectedCategory("recaudacion")}
                 >
                   <div className="p-8 flex flex-col items-center text-center gap-4">
@@ -133,8 +197,8 @@ export default function Home() {
                 </Card>
 
                 <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-green-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  onClick={() => setSelectedCategory("capacitacion")}
+                  className="w-full bg-white/95 backdrop-blur-sm hover:bg-green-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => { setSelectedCategory("capacitacion"); setCapStep("subgerencia") }}
                 >
                   <div className="p-8 flex flex-col items-center text-center gap-4">
                     <GraduationCap className="w-16 h-16 text-green-600 group-hover:text-white transition-colors" />
@@ -150,34 +214,17 @@ export default function Home() {
                 </Card>
 
                 <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-purple-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  onClick={() => setSelectedCategory("certificaciones")}
-                >
-                  <div className="p-8 flex flex-col items-center text-center gap-4">
-                    <ShieldCheck className="w-16 h-16 text-purple-600 group-hover:text-white transition-colors" />
-                    <div>
-                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Certificaciones
-                      </h3>
-                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
-                        Certificaciones emitidas
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className="bg-white/95 backdrop-blur-sm hover:bg-orange-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  onClick={() => setSelectedCategory("senalizaciones")}
+                  className="w-full bg-white/95 backdrop-blur-sm hover:bg-orange-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => { setSelectedCategory("senalizaciones"); setSenalStep("subgerencia") }}
                 >
                   <div className="p-8 flex flex-col items-center text-center gap-4">
                     <Building className="w-16 h-16 text-orange-600 group-hover:text-white transition-colors" />
                     <div>
                       <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Señalizaciones
+                        Señalización
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
-                        Señalización horizontal de vías
+                        Tipos de señalización
                       </p>
                     </div>
                   </div>
@@ -596,27 +643,122 @@ export default function Home() {
                       </div>
                     </Card>
 
-                  </div>
+                   </div>
                 )}
 
                 {selectedCategory === "capacitacion" && (
-                  <TipoDetailModal
-                    isOpen={true}
-                    onClose={() => setSelectedCategory(null)}
-                    subgerencia="Subgerencia de Seguridad y Educación Vial"
-                    tipo="Capacitación Vial"
-                    year={selectedYear}
-                    metrica="cantidad"
-                    estado={selectedEstado}
-                    subtipos={[
-                      { subtipo: "Capacitación para Vehículos menores", cantidad: 18000 },
-                      { subtipo: "Capacitación para Taxi", cantidad: 7200 },
-                      { subtipo: "Capacitación para Transporte urbano", cantidad: 5400 }
-                    ]}
-                    totalCantidad={30600}
-                  />
+                  <div className="space-y-6">
+                    {capStep === "subgerencia" && (
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 cursor-pointer hover:shadow-lg transition-all" onClick={() => setCapStep("detalle")}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                              <GraduationCap className="w-8 h-8 text-green-600" />
+                              Sub. Seguridad Educación Vial
+                            </h3>
+                            <p className="text-gray-600">Capacitaciones viales realizadas por la Subgerencia de Seguridad y Educación Vial</p>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {capStep === "detalle" && (
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
+                        {/* Banner total choferes */}
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg py-4 px-6 text-center text-lg font-bold shadow-md">
+                          {totalCapacitaciones.toLocaleString('es-PE')} choferes capacitados
+                        </div>
+
+                        {/* Capacitaciones por modo de transporte */}
+                        <div className="space-y-3">
+                          <h3 className="text-xl font-bold text-gray-900">Capacitaciones por modo de transporte</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {capacitacionPorModo.map((item) => (
+                              <div key={item.modo} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
+                                <p className="text-sm font-semibold text-gray-900">
+                                  {item.cantidad.toLocaleString('es-PE')} choferes capacitados
+                                </p>
+                                <p className="text-xs text-gray-700 mt-1">en {item.modo.toLowerCase()}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Gráfico de barras con tabla por mes */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            Gráfico de barras con tabla por mes
+                          </h4>
+
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              {capacitacionMensualData.map((item) => (
+                                <div key={item.mes} className="flex items-center gap-2">
+                                  <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
+                                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                    <div
+                                      className="bg-green-500 h-full rounded-full transition-all"
+                                      style={{ width: `${(item.choferes / maxChoferesMensual) * 100}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Choferes capacitados</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {capacitacionMensualData.map((item) => (
+                                    <tr key={item.mes} className="border-b hover:bg-gray-50">
+                                      <td className="py-2 px-2 text-gray-700">{item.mes}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.choferes.toLocaleString('es-PE')}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Capacitaciones por temas */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            Capacitaciones por temas
+                          </h4>
+
+                          <div className="space-y-3">
+                            {capacitacionTemasData.map((item) => (
+                              <div key={item.tema} className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-600 w-48">{item.tema}</span>
+                                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                  <div
+                                    className="bg-green-500 h-full rounded-full transition-all"
+                                    style={{ width: `${(item.choferes / maxChoferesTema) * 100}%` }}
+                                  />
+                                </div>
+                                <span className="w-24 text-right text-xs font-semibold text-gray-700">{item.choferes.toLocaleString('es-PE')}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <p className="mt-4 text-xs md:text-sm text-gray-700 font-semibold bg-green-50 border border-green-200 rounded-md px-3 py-2">
+                            Las capacitaciones es obligatorio para obtener sus permisos de circulación
+                          </p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
                 )}
 
+                {/* Sección de Certificaciones (temporalmente deshabilitada)
                 {selectedCategory === "certificaciones" && (
                   <TipoDetailModal
                     isOpen={true}
@@ -632,22 +774,130 @@ export default function Home() {
                     totalCantidad={18000}
                   />
                 )}
+                */}
 
                 {selectedCategory === "senalizaciones" && (
-                  <TipoDetailModal
-                    isOpen={true}
-                    onClose={() => setSelectedCategory(null)}
-                    subgerencia="Subgerencia de Tránsito y Movilidad Urbana"
-                    tipo="Señalización Horizontal Vías"
-                    year={selectedYear}
-                    metrica="cantidad"
-                    estado={selectedEstado}
-                    subtipos={[
-                      { subtipo: "m2", cantidad: 5 },
-                      { subtipo: "km", cantidad: 30 }
-                    ]}
-                    totalCantidad={35}
-                  />
+                  <div className="space-y-6">
+                    {senalStep === "subgerencia" && (
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 cursor-pointer hover:shadow-lg transition-all" onClick={() => setSenalStep("horizontal")}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                              <Building className="w-8 h-8 text-orange-600" />
+                              Subgerencia de Tránsito y Movilidad Urbana
+                            </h3>
+                            <p className="text-gray-600">Indicadores de Señalización dentro de la Subgerencia de Tránsito</p>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {senalStep === "horizontal" && (
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 cursor-pointer hover:shadow-lg transition-all" onClick={() => setSenalStep("detalle")}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                              <Building className="w-8 h-8 text-orange-600" />
+                              Señales Horizontales de vías
+                            </h3>
+                            <p className="text-gray-600">Señalización horizontal para mantenimiento de vías</p>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {senalStep === "detalle" && (
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
+                        <div className="flex flex-col gap-2">
+                          <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                            <Building className="w-8 h-8 text-orange-600" />
+                            Subgerencia de Tránsito y Movilidad Urbana → Señales Horizontales de vías
+                          </h3>
+                          <p className="text-lg text-gray-600 font-semibold">M2 de señalización horizontal</p>
+                        </div>
+
+                        {/* Total m2 destacado */}
+                        <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-4 rounded-lg text-white shadow-lg mb-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-orange-100 text-xs font-medium mb-1">Total intervenido</p>
+                              <p className="text-2xl font-bold">5,000 m²</p>
+                            </div>
+                            <div className="text-xs flex flex-col gap-1 text-right">
+                              <span><span className="font-semibold">Año:</span> {selectedYear}</span>
+                              <span><span className="font-semibold">Estado:</span> {selectedEstado}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Gráfico de barras / tabla por mes */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-orange-600" />
+                            Gráfico de barras / tabla por mes
+                          </h4>
+
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              {senalizacionMensualData.map((item) => (
+                                <div key={item.mes} className="flex items-center gap-2">
+                                  <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
+                                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                    <div
+                                      className="bg-orange-500 h-full rounded-full transition-all"
+                                      style={{ width: `${(item.m2 / maxM2Mensual) * 100}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">M2 intervenidos</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {senalizacionMensualData.map((item) => (
+                                    <tr key={item.mes} className="border-b hover:bg-gray-50">
+                                      <td className="py-2 px-2 text-gray-700">{item.mes}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Señalización por tipo */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-orange-600" />
+                            Señalización por tipo
+                          </h4>
+
+                          <div className="space-y-3">
+                            {senalizacionTiposData.map((item) => (
+                              <div key={item.tipo} className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-600 w-36">{item.tipo}</span>
+                                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                  <div
+                                    className="bg-orange-500 h-full rounded-full transition-all"
+                                    style={{ width: `${(item.m2 / maxM2Tipo) * 100}%` }}
+                                  />
+                                </div>
+                                <span className="w-20 text-right text-xs font-semibold text-gray-700">{item.m2.toLocaleString('es-PE')} m²</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
                 )}
 
                 {selectedCategory === "permisos" && (
