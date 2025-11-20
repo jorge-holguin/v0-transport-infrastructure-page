@@ -133,7 +133,7 @@ export default function Home() {
 
   const capacitacionPorModo = [
     { modo: "Vehículos menores", cantidad: 18000 },
-    { modo: "Taxi", cantidad: 7200 },
+    { modo: "Servicio de Taxi", cantidad: 7200 },
     { modo: "Transporte urbano", cantidad: 5400 }
   ]
 
@@ -664,9 +664,20 @@ export default function Home() {
 
                     {capStep === "detalle" && (
                       <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
-                        {/* Banner total choferes */}
-                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg py-4 px-6 text-center text-lg font-bold shadow-md">
-                          {totalCapacitaciones.toLocaleString('es-PE')} choferes capacitados
+                        {/* Banner total choferes - mismo formato que otros encabezados */}
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 rounded-lg text-white shadow-lg mb-2">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-green-100 text-xs font-medium mb-1">Total choferes capacitados</p>
+                              <p className="text-2xl font-bold">
+                                {totalCapacitaciones.toLocaleString('es-PE')} choferes capacitados
+                              </p>
+                            </div>
+                            <div className="text-[10px] md:text-xs flex flex-col gap-1 text-right">
+                              <span><span className="font-semibold">Año:</span> {selectedYear}</span>
+                              <span><span className="font-semibold">Estado:</span> {selectedEstado}</span>
+                            </div>
+                          </div>
                         </div>
 
                         {/* Capacitaciones por modo de transporte */}
