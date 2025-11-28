@@ -126,7 +126,6 @@ export function ComparativoSubgerenciasModal({
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <div><span className="font-semibold">Año:</span> {year}</div>
-                <div><span className="font-semibold">Métrica:</span> {metrica === "soles" ? "Soles (S/)" : "Cantidad"}</div>
                 <div><span className="font-semibold">Subgerencias:</span> {subgerencias.length}</div>
               </div>
             </div>

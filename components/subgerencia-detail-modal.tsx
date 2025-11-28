@@ -24,8 +24,8 @@ const CHART_COLORS = [
   '#3b82f6', // blue-500
   '#f97316', // orange-500
   '#10b981', // green-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
+  '#6366f1', // indigo-500 (más institucional)
+  '#38bdf8', // sky-400 (celeste institucional)
   '#f59e0b', // amber-500
   '#06b6d4', // cyan-500
   '#6366f1', // indigo-500
@@ -140,6 +140,38 @@ export function SubgerenciaDetailModal({
   // Check if soles data is available
   const hasSolesData = totalSoles !== undefined && totalSoles > 0
 
+  const [filterYear, setFilterYear] = useState(year)
+  const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
+  const [isPeriodoOpen, setIsPeriodoOpen] = useState(false)
+
+  const baseYear = parseInt(year, 10)
+  const yearOptions = isNaN(baseYear)
+    ? [year]
+    : [baseYear - 2, baseYear - 1, baseYear, baseYear + 1, baseYear + 2].map(String)
+
+  const periodoOptions = [
+    { value: "Todos", label: "Todos" },
+    { value: "Enero", label: "Ene" },
+    { value: "Febrero", label: "Feb" },
+    { value: "Marzo", label: "Mar" },
+    { value: "Abril", label: "Abr" },
+    { value: "Mayo", label: "May" },
+    { value: "Junio", label: "Jun" },
+    { value: "Julio", label: "Jul" },
+    { value: "Agosto", label: "Ago" },
+    { value: "Septiembre", label: "Sep" },
+    { value: "Octubre", label: "Oct" },
+    { value: "Noviembre", label: "Nov" },
+    { value: "Diciembre", label: "Dic" },
+  ]
+
+  const selectedPeriodSummary = filterPeriodos.includes("Todos")
+    ? "Todos"
+    : periodoOptions
+        .filter((p) => filterPeriodos.includes(p.value))
+        .map((p) => p.label)
+        .join(", ") || "Seleccionar"
+
   const handleTipoClick = (detalle: DetalleNivel2) => {
     if (detalle.subtipos && detalle.subtipos.length > 0) {
       setSelectedTipo(detalle)
@@ -228,10 +260,88 @@ export function SubgerenciaDetailModal({
                   }
                 </p>
               </div>
-              <div className="flex items-center gap-2 md:gap-4 text-[10px] md:text-xs flex-wrap">
-                <div><span className="font-semibold">Año:</span> {year}</div>
-                <div><span className="font-semibold">Estado:</span> {estado}</div>
-                <div className="hidden md:block"><span className="font-semibold">Métrica:</span> {currentMetrica === "soles" ? "Soles" : "Cantidad"}</div>
+              <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold">Año:</span>
+                  <select
+                    value={filterYear}
+                    onChange={(e) => setFilterYear(e.target.value)}
+                    className="border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"
+                  >
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y} className="text-gray-900">
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-start gap-1 relative">
+                  <span className="font-semibold mt-0.5">Meses/Periodo:</span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsPeriodoOpen((prev) => !prev)}
+                      className="flex items-center gap-1 border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70 min-w-[140px] justify-between"
+                    >
+                      <span className="truncate text-left">
+                        {selectedPeriodSummary}
+                      </span>
+                      <span className="text-[9px]">▼</span>
+                    </button>
+                    {isPeriodoOpen && (
+                      <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
+                        <div className="p-2 text-[11px] font-semibold text-gray-700 border-b border-gray-100">
+                          Selecciona meses / periodos
+                        </div>
+                        <div className="p-2 flex flex-col gap-1 text-xs">
+                          {periodoOptions.map((p) => {
+                            const checked = filterPeriodos.includes(p.value)
+                            return (
+                              <label
+                                key={p.value}
+                                className="flex items-center gap-2 px-1 py-0.5 rounded hover:bg-gray-100 cursor-pointer"
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="h-3 w-3 accent-blue-600"
+                                  checked={checked}
+                                  onChange={(e) => {
+                                    setFilterPeriodos((prev) => {
+                                      const monthValues = periodoOptions
+                                        .filter((opt) => opt.value !== "Todos")
+                                        .map((opt) => opt.value)
+
+                                      if (e.target.checked) {
+                                        if (p.value === "Todos") {
+                                          // Seleccionar todos los meses cuando se marca "Todos"
+                                          return ["Todos", ...monthValues]
+                                        }
+                                        // Quitar "Todos" si estaba y agregar el mes
+                                        return [...prev.filter((v) => v !== "Todos"), p.value]
+                                      }
+
+                                      // Desmarcar
+                                      if (p.value === "Todos") {
+                                        // Quitar 'Todos' y desmarcar todos los meses
+                                        return []
+                                      }
+
+                                      const next = prev.filter((v) => v !== p.value)
+                                      const remainingMonths = next.filter((v) => v !== "Todos")
+                                      // Si ya no queda ningún mes seleccionado, dejamos todo vacío
+                                      return remainingMonths.length === 0 ? [] : next
+                                    })
+                                  }}
+                                />
+                                <span className="text-[11px]">{p.label}</span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -246,17 +356,26 @@ export function SubgerenciaDetailModal({
               </h4>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                  {detalles.map((detalle, index) => (
-                    <Card 
-                      key={index} 
-                      className={`p-3 bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-blue-400 transition-all ${detalle.subtipos && detalle.subtipos.length > 0 ? 'cursor-pointer hover:shadow-lg' : ''}`}
-                      onClick={() => handleTipoClick(detalle)}
-                    >
-                      <div className="space-y-1">
-                        <h5 className="font-semibold text-gray-900 text-xs leading-tight">{detalle.tipo}</h5>
-                        <div className="flex flex-col gap-0.5">
+                  {detalles.map((detalle, index) => {
+                    const color = CHART_COLORS[index % CHART_COLORS.length]
+                    return (
+                      <Card 
+                        key={index} 
+                        className={`p-3 border hover:shadow-md transition-all bg-white ${detalle.subtipos && detalle.subtipos.length > 0 ? 'cursor-pointer hover:shadow-lg' : ''}`}
+                        style={{ borderColor: color, backgroundColor: `${color}10` }}
+                        onClick={() => handleTipoClick(detalle)}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span 
+                              className="w-2 h-2 rounded-full flex-shrink-0" 
+                              style={{ backgroundColor: color }} 
+                            />
+                            <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">{detalle.tipo}</h5>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
                           {currentMetrica === "soles" && detalle.soles !== undefined && (
-                            <>
+                            <div className="flex items-baseline gap-1">
                               <span className="text-lg font-bold text-blue-600">
                                 S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </span>
@@ -265,10 +384,10 @@ export function SubgerenciaDetailModal({
                                   {detalle.cantidad} unidades
                                 </span>
                               )}
-                            </>
+                            </div>
                           )}
                           {currentMetrica === "cantidad" && detalle.cantidad !== undefined && (
-                            <>
+                            <div className="flex items-baseline gap-10">
                               <span className="text-lg font-bold text-blue-600">
                                 {detalle.cantidad.toLocaleString('es-PE')}
                               </span>
@@ -278,12 +397,12 @@ export function SubgerenciaDetailModal({
                                   S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </span>
                               )}
-                            </>
+                            </div>
                           )}
                         </div>
                       </div>
                     </Card>
-                  ))}
+                  )})}
                 </div>
             </div>
 

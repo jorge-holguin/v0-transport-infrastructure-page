@@ -309,7 +309,6 @@ export default function Home() {
                           </div>
                           <div className="flex items-center gap-4 text-xs">
                             <div><span className="font-semibold">Año:</span> {selectedYear}</div>
-                            <div><span className="font-semibold">Métrica:</span> {selectedMetrica === "soles" ? "Soles (S/)" : "Cantidad"}</div>
                           </div>
                         </div>
                       </div>
