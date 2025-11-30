@@ -374,32 +374,39 @@ export function SubgerenciaDetailModal({
                             <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">{detalle.tipo}</h5>
                           </div>
                           <div className="flex flex-col gap-0.5">
-                          {currentMetrica === "soles" && detalle.soles !== undefined && (
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-bold text-blue-600">
-                                S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </span>
-                              {detalle.cantidad !== undefined && (
-                                <span className="text-xs text-gray-500">
-                                  {detalle.cantidad} unidades
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          {currentMetrica === "cantidad" && detalle.cantidad !== undefined && (
-                            <div className="flex items-baseline gap-10">
-                              <span className="text-lg font-bold text-blue-600">
-                                {detalle.cantidad.toLocaleString('es-PE')}
-                              </span>
-                              <span className="text-xs text-gray-500">unidades</span>
-                              {detalle.soles !== undefined && (
-                                <span className="text-xs text-gray-500">
-                                  S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                            {currentMetrica === "cantidad" && detalle.cantidad !== undefined ? (
+                              // Cantidad como métrica principal: cantidad + unidades a la izquierda, soles a la derecha, centrado en el card
+                              <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
+                                <div className="flex items-baseline gap-1">
+                                  <span className="text-lg font-bold text-blue-600">
+                                    {detalle.cantidad.toLocaleString('es-PE')}
+                                  </span>
+                                  <span className="text-xs text-gray-500">unidades</span>
+                                </div>
+                                {detalle.soles !== undefined && (
+                                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                                    S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              // Soles como métrica principal: soles a la izquierda, cantidad a la derecha, misma separación
+                              <>
+                                {currentMetrica === "soles" && detalle.soles !== undefined && (
+                                  <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
+                                    <span className="text-lg font-bold text-blue-600 whitespace-nowrap">
+                                      S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                    </span>
+                                    {detalle.cantidad !== undefined && (
+                                      <span className="text-xs text-gray-500">
+                                        {detalle.cantidad.toLocaleString('es-PE')} unidades
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
                       </div>
                     </Card>
                   )})}

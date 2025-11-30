@@ -32,10 +32,11 @@ const CHART_COLORS = [
 
 // Componente de gráfico de torta para Nivel 3
 function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], metrica: "soles" | "cantidad" }) {
-  const total = subtipos.reduce((sum, subtipo) => {
-    const value = metrica === "soles" ? (subtipo.soles || 0) : (subtipo.cantidad || 0)
-    return sum + value
-  }, 0)
+  const values = subtipos.map((subtipo) =>
+    metrica === "soles" ? (subtipo.soles || 0) : (subtipo.cantidad || 0)
+  )
+
+  const total = values.reduce((sum, value) => sum + value, 0)
 
   if (total === 0) {
     return (
@@ -45,10 +46,31 @@ function SubtipoPieChart({ subtipos, metrica }: { subtipos: SubtipoDetalle[], me
     )
   }
 
+  // Calcular porcentajes con normalización para que la suma redondeada sea exactamente 100%
+  const rawPercentages = values.map((value) => (value / total) * 100)
+  const roundedPercentages = rawPercentages.map((p) => Number(p.toFixed(1)))
+  const roundedSum = roundedPercentages.reduce((sum, p) => sum + p, 0)
+  const diff = Number((100 - roundedSum).toFixed(1))
+
+  if (Math.abs(diff) > 0 && roundedPercentages.length > 0) {
+    // Ajustar el último segmento no nulo para corregir el desajuste de redondeo
+    const lastIndex = [...roundedPercentages]
+      .map((p, i) => ({ p, i }))
+      .filter(({ p }) => p > 0)
+      .map(({ i }) => i)
+      .pop()
+
+    if (lastIndex !== undefined) {
+      roundedPercentages[lastIndex] = Number(
+        (roundedPercentages[lastIndex] + diff).toFixed(1)
+      )
+    }
+  }
+
   let currentAngle = 0
   const segments = subtipos.map((subtipo, index) => {
-    const value = metrica === "soles" ? (subtipo.soles || 0) : (subtipo.cantidad || 0)
-    const percentage = (value / total) * 100
+    const value = values[index]
+    const percentage = roundedPercentages[index] ?? 0
     const angle = (percentage / 100) * 360
     const segment = {
       subtipo,
@@ -281,22 +303,17 @@ export function TipoDetailModal({
 
                                       if (e.target.checked) {
                                         if (p.value === "Todos") {
-                                          // Seleccionar todos los meses cuando se marca "Todos"
                                           return ["Todos", ...monthValues]
                                         }
-                                        // Quitar "Todos" si estaba y agregar el mes
                                         return [...prev.filter((v) => v !== "Todos"), p.value]
                                       }
 
-                                      // Desmarcar
                                       if (p.value === "Todos") {
-                                        // Quitar 'Todos' y desmarcar todos los meses
                                         return []
                                       }
 
                                       const next = prev.filter((v) => v !== p.value)
                                       const remainingMonths = next.filter((v) => v !== "Todos")
-                                      // Si ya no queda ningún mes seleccionado, dejamos todo vacío
                                       return remainingMonths.length === 0 ? [] : next
                                     })
                                   }}
@@ -322,51 +339,53 @@ export function TipoDetailModal({
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
                 <span>Detalle por Subtipo</span>
               </h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                  {subtipos.map((subtipo, index) => {
-                    const color = CHART_COLORS[index % CHART_COLORS.length]
-                    return (
-                      <Card 
-                        key={index} 
-                        className="p-3 border hover:shadow-md transition-all bg-white"
-                        style={{ borderColor: color, backgroundColor: `${color}15` }}
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span 
-                              className="w-2 h-2 rounded-full flex-shrink-0" 
-                              style={{ backgroundColor: color }} 
-                            />
-                            <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">
-                              {subtipo.subtipo}
-                            </h5>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
+                {subtipos.map((subtipo, index) => {
+                  const color = CHART_COLORS[index % CHART_COLORS.length]
+                  return (
+                    <Card
+                      key={index}
+                      className="p-3 border hover:shadow-md transition-all bg-white"
+                      style={{ borderColor: color, backgroundColor: `${color}15` }}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: color }}
+                          />
+                          <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">
+                            {subtipo.subtipo}
+                          </h5>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
                           {currentMetrica === "cantidad" ? (
-                            // Métrica por cantidad: unidades como valor principal y precio pequeño al costado si existe
-                            <div className="flex items-baseline gap-10">
-                              <span className="text-lg font-bold text-purple-600">
-                                {(subtipo.cantidad || 0).toLocaleString('es-PE')}
-                              </span>
-                              <span className="text-xs text-gray-500">unidades</span>
+                            // Cantidad como métrica principal: cantidad + unidades a la izquierda, soles a la derecha, centrado en el card
+                            <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-lg font-bold text-purple-600">
+                                  {(subtipo.cantidad || 0).toLocaleString('es-PE')}
+                                </span>
+                                <span className="text-xs text-gray-500">unidades</span>
+                              </div>
                               {subtipo.soles !== undefined && (
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-500 whitespace-nowrap">
                                   S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </span>
                               )}
                             </div>
                           ) : (
-                            // Métrica por soles: monto + unidades
+                            // Soles como métrica principal: soles a la izquierda, cantidad a la derecha, misma separación
                             <>
                               {subtipo.soles !== undefined && (
-                                <div className="flex items-baseline gap-1">
-                                  <span className="text-lg font-bold text-purple-600">
+                                <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
+                                  <span className="text-lg font-bold text-purple-600 whitespace-nowrap">
                                     S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                   </span>
                                   {subtipo.cantidad !== undefined && (
                                     <span className="text-xs text-gray-500">
-                                      {subtipo.cantidad} unidades
+                                      {subtipo.cantidad.toLocaleString('es-PE')} unidades
                                     </span>
                                   )}
                                 </div>
@@ -376,8 +395,9 @@ export function TipoDetailModal({
                         </div>
                       </div>
                     </Card>
-                  )})}
-                </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Gráfico de Torta */}
