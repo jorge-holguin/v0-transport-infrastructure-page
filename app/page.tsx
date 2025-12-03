@@ -31,6 +31,70 @@ export default function Home() {
   const [senalStep, setSenalStep] = useState<"subgerencia" | "horizontal" | "detalle">("subgerencia")
   const [capStep, setCapStep] = useState<"subgerencia" | "detalle">("subgerencia")
 
+  const [capFilterYear, setCapFilterYear] = useState(selectedYear)
+  const [capFilterPeriodos, setCapFilterPeriodos] = useState<string[]>(["Todos"])
+  const [isCapPeriodoOpen, setIsCapPeriodoOpen] = useState(false)
+
+  const capBaseYear = parseInt(selectedYear, 10)
+  const capYearOptions = isNaN(capBaseYear)
+    ? [selectedYear]
+    : [capBaseYear - 2, capBaseYear - 1, capBaseYear, capBaseYear + 1, capBaseYear + 2].map(String)
+
+  const capPeriodoOptions = [
+    { value: "Todos", label: "Todos" },
+    { value: "Enero", label: "Ene" },
+    { value: "Febrero", label: "Feb" },
+    { value: "Marzo", label: "Mar" },
+    { value: "Abril", label: "Abr" },
+    { value: "Mayo", label: "May" },
+    { value: "Junio", label: "Jun" },
+    { value: "Julio", label: "Jul" },
+    { value: "Agosto", label: "Ago" },
+    { value: "Septiembre", label: "Sep" },
+    { value: "Octubre", label: "Oct" },
+    { value: "Noviembre", label: "Nov" },
+    { value: "Diciembre", label: "Dic" }
+  ]
+
+  const capSelectedPeriodSummary = capFilterPeriodos.includes("Todos")
+    ? "Todos"
+    : capPeriodoOptions
+        .filter((p) => capFilterPeriodos.includes(p.value))
+        .map((p) => p.label)
+        .join(", ") || "Seleccionar"
+
+  const [senalFilterYear, setSenalFilterYear] = useState(selectedYear)
+  const [senalFilterPeriodos, setSenalFilterPeriodos] = useState<string[]>(["Todos"])
+  const [isSenalPeriodoOpen, setIsSenalPeriodoOpen] = useState(false)
+
+  const senalBaseYear = parseInt(selectedYear, 10)
+  const senalYearOptions = isNaN(senalBaseYear)
+    ? [selectedYear]
+    : [senalBaseYear - 2, senalBaseYear - 1, senalBaseYear, senalBaseYear + 1, senalBaseYear + 2].map(String)
+
+  const senalPeriodoOptions = [
+    { value: "Todos", label: "Todos" },
+    { value: "Enero", label: "Ene" },
+    { value: "Febrero", label: "Feb" },
+    { value: "Marzo", label: "Mar" },
+    { value: "Abril", label: "Abr" },
+    { value: "Mayo", label: "May" },
+    { value: "Junio", label: "Jun" },
+    { value: "Julio", label: "Jul" },
+    { value: "Agosto", label: "Ago" },
+    { value: "Septiembre", label: "Sep" },
+    { value: "Octubre", label: "Oct" },
+    { value: "Noviembre", label: "Nov" },
+    { value: "Diciembre", label: "Dic" }
+  ]
+
+  const senalSelectedPeriodSummary = senalFilterPeriodos.includes("Todos")
+    ? "Todos"
+    : senalPeriodoOptions
+        .filter((p) => senalFilterPeriodos.includes(p.value))
+        .map((p) => p.label)
+        .join(", ") || "Seleccionar"
+
   // Datos para el gráfico comparativo con avance y meta (solo recaudación)
   const subgerenciasData = [
     { 
@@ -117,7 +181,14 @@ export default function Home() {
     { mes: "Diciembre", m2: 360 }
   ]
 
-  const maxM2Mensual = Math.max(...senalizacionMensualData.map((i) => i.m2))
+  const filteredSenalizacionMensualData = senalizacionMensualData.filter((item) => {
+    if (senalFilterPeriodos.length === 0 || senalFilterPeriodos.includes("Todos")) return true
+    return senalFilterPeriodos.includes(item.mes)
+  })
+
+  const maxM2Mensual = filteredSenalizacionMensualData.length
+    ? Math.max(...filteredSenalizacionMensualData.map((i) => i.m2))
+    : 0
 
   const senalizacionTiposData = [
     { tipo: "Pasos peatonales", m2: 2000 },
@@ -152,7 +223,14 @@ export default function Home() {
     { mes: "Diciembre", choferes: 2150 }
   ]
 
-  const maxChoferesMensual = Math.max(...capacitacionMensualData.map((i) => i.choferes))
+  const filteredCapacitacionMensualData = capacitacionMensualData.filter((item) => {
+    if (capFilterPeriodos.length === 0 || capFilterPeriodos.includes("Todos")) return true
+    return capFilterPeriodos.includes(item.mes)
+  })
+
+  const maxChoferesMensual = filteredCapacitacionMensualData.length
+    ? Math.max(...filteredCapacitacionMensualData.map((i) => i.choferes))
+    : 0
 
   const capacitacionTemasData = [
     { tema: "Seguridad vial", choferes: 12000 },
@@ -672,9 +750,83 @@ export default function Home() {
                                 {totalCapacitaciones.toLocaleString('es-PE')} choferes capacitados
                               </p>
                             </div>
-                            <div className="text-[10px] md:text-xs flex flex-col gap-1 text-right">
-                              <span><span className="font-semibold">Año:</span> {selectedYear}</span>
-                              <span><span className="font-semibold">Estado:</span> {selectedEstado}</span>
+                            <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
+                              <div className="flex items-center gap-1">
+                                <span className="font-semibold">Año:</span>
+                                <select
+                                  value={capFilterYear}
+                                  onChange={(e) => setCapFilterYear(e.target.value)}
+                                  className="border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"
+                                >
+                                  {capYearOptions.map((y) => (
+                                    <option key={y} value={y} className="text-gray-900">
+                                      {y}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex items-start gap-1 relative">
+                                <span className="font-semibold mt-0.5">Meses/Periodo:</span>
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsCapPeriodoOpen((prev) => !prev)}
+                                    className="flex items-center gap-1 border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70 min-w-[140px] justify-between"
+                                  >
+                                    <span className="truncate text-left">
+                                      {capSelectedPeriodSummary}
+                                    </span>
+                                    <span className="text-[9px]">▼</span>
+                                  </button>
+                                  {isCapPeriodoOpen && (
+                                    <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
+                                      <div className="p-2 text-[11px] font-semibold text-gray-700 border-b border-gray-100">
+                                        Selecciona meses / periodos
+                                      </div>
+                                      <div className="p-2 flex flex-col gap-1 text-xs">
+                                        {capPeriodoOptions.map((p) => {
+                                          const checked = capFilterPeriodos.includes(p.value)
+                                          return (
+                                            <label
+                                              key={p.value}
+                                              className="flex items-center gap-2 px-1 py-0.5 rounded hover:bg-gray-100 cursor-pointer"
+                                            >
+                                              <input
+                                                type="checkbox"
+                                                className="h-3 w-3 accent-blue-600"
+                                                checked={checked}
+                                                onChange={(e) => {
+                                                  setCapFilterPeriodos((prev) => {
+                                                    const monthValues = capPeriodoOptions
+                                                      .filter((opt) => opt.value !== "Todos")
+                                                      .map((opt) => opt.value)
+
+                                                    if (e.target.checked) {
+                                                      if (p.value === "Todos") {
+                                                        return ["Todos", ...monthValues]
+                                                      }
+                                                      return [...prev.filter((v) => v !== "Todos"), p.value]
+                                                    }
+
+                                                    if (p.value === "Todos") {
+                                                      return []
+                                                    }
+
+                                                    const next = prev.filter((v) => v !== p.value)
+                                                    const remainingMonths = next.filter((v) => v !== "Todos")
+                                                    return remainingMonths.length === 0 ? [] : next
+                                                  })
+                                                }}
+                                              />
+                                              <span className="text-[11px]">{p.label}</span>
+                                            </label>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -703,13 +855,13 @@ export default function Home() {
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              {capacitacionMensualData.map((item) => (
+                              {filteredCapacitacionMensualData.map((item) => (
                                 <div key={item.mes} className="flex items-center gap-2">
                                   <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
                                   <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
                                     <div
                                       className="bg-green-500 h-full rounded-full transition-all"
-                                      style={{ width: `${(item.choferes / maxChoferesMensual) * 100}%` }}
+                                      style={{ width: `${maxChoferesMensual ? (item.choferes / maxChoferesMensual) * 100 : 0}%` }}
                                     />
                                   </div>
                                 </div>
@@ -725,7 +877,7 @@ export default function Home() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {capacitacionMensualData.map((item) => (
+                                  {filteredCapacitacionMensualData.map((item) => (
                                     <tr key={item.mes} className="border-b hover:bg-gray-50">
                                       <td className="py-2 px-2 text-gray-700">{item.mes}</td>
                                       <td className="py-2 px-2 text-right font-medium text-gray-900">{item.choferes.toLocaleString('es-PE')}</td>
@@ -833,9 +985,83 @@ export default function Home() {
                               <p className="text-orange-100 text-xs font-medium mb-1">Total intervenido</p>
                               <p className="text-2xl font-bold">5,000 m²</p>
                             </div>
-                            <div className="text-xs flex flex-col gap-1 text-right">
-                              <span><span className="font-semibold">Año:</span> {selectedYear}</span>
-                              <span><span className="font-semibold">Estado:</span> {selectedEstado}</span>
+                            <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
+                              <div className="flex items-center gap-1">
+                                <span className="font-semibold">Año:</span>
+                                <select
+                                  value={senalFilterYear}
+                                  onChange={(e) => setSenalFilterYear(e.target.value)}
+                                  className="border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"
+                                >
+                                  {senalYearOptions.map((y) => (
+                                    <option key={y} value={y} className="text-gray-900">
+                                      {y}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex items-start gap-1 relative">
+                                <span className="font-semibold mt-0.5">Meses/Periodo:</span>
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsSenalPeriodoOpen((prev) => !prev)}
+                                    className="flex items-center gap-1 border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70 min-w-[140px] justify-between"
+                                  >
+                                    <span className="truncate text-left">
+                                      {senalSelectedPeriodSummary}
+                                    </span>
+                                    <span className="text-[9px]">▼</span>
+                                  </button>
+                                  {isSenalPeriodoOpen && (
+                                    <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
+                                      <div className="p-2 text-[11px] font-semibold text-gray-700 border-b border-gray-100">
+                                        Selecciona meses / periodos
+                                      </div>
+                                      <div className="p-2 flex flex-col gap-1 text-xs">
+                                        {senalPeriodoOptions.map((p) => {
+                                          const checked = senalFilterPeriodos.includes(p.value)
+                                          return (
+                                            <label
+                                              key={p.value}
+                                              className="flex items-center gap-2 px-1 py-0.5 rounded hover:bg-gray-100 cursor-pointer"
+                                            >
+                                              <input
+                                                type="checkbox"
+                                                className="h-3 w-3 accent-blue-600"
+                                                checked={checked}
+                                                onChange={(e) => {
+                                                  setSenalFilterPeriodos((prev) => {
+                                                    const monthValues = senalPeriodoOptions
+                                                      .filter((opt) => opt.value !== "Todos")
+                                                      .map((opt) => opt.value)
+
+                                                    if (e.target.checked) {
+                                                      if (p.value === "Todos") {
+                                                        return ["Todos", ...monthValues]
+                                                      }
+                                                      return [...prev.filter((v) => v !== "Todos"), p.value]
+                                                    }
+
+                                                    if (p.value === "Todos") {
+                                                      return []
+                                                    }
+
+                                                    const next = prev.filter((v) => v !== p.value)
+                                                    const remainingMonths = next.filter((v) => v !== "Todos")
+                                                    return remainingMonths.length === 0 ? [] : next
+                                                  })
+                                                }}
+                                              />
+                                              <span className="text-[11px]">{p.label}</span>
+                                            </label>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -849,13 +1075,13 @@ export default function Home() {
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              {senalizacionMensualData.map((item) => (
+                              {filteredSenalizacionMensualData.map((item) => (
                                 <div key={item.mes} className="flex items-center gap-2">
                                   <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
                                   <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
                                     <div
                                       className="bg-orange-500 h-full rounded-full transition-all"
-                                      style={{ width: `${(item.m2 / maxM2Mensual) * 100}%` }}
+                                      style={{ width: `${maxM2Mensual ? (item.m2 / maxM2Mensual) * 100 : 0}%` }}
                                     />
                                   </div>
                                 </div>
@@ -871,7 +1097,7 @@ export default function Home() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {senalizacionMensualData.map((item) => (
+                                  {filteredSenalizacionMensualData.map((item) => (
                                     <tr key={item.mes} className="border-b hover:bg-gray-50">
                                       <td className="py-2 px-2 text-gray-700">{item.mes}</td>
                                       <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
