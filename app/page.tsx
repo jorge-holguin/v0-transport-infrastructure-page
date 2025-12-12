@@ -8,7 +8,7 @@ import { RecaudacionCard } from "@/components/recaudacion-card"
 import { PermisoCard } from "@/components/permiso-card"
 import { SubgerenciaCard } from "@/components/subgerencia-card"
 import { RecaudacionFilters } from "@/components/recaudacion-filters"
-import { Building, Users, ShieldCheck, GraduationCap } from "lucide-react"
+import { Building, Users, ShieldCheck, GraduationCap, Car } from "lucide-react"
 import { CustomNavbar } from "@/components/custom-navbar"
 import { TipoDetailModal } from "@/components/tipo-detail-modal"
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
@@ -191,10 +191,11 @@ export default function Home() {
     : 0
 
   const senalizacionTiposData = [
-    { tipo: "Pasos peatonales", m2: 2000 },
-    { tipo: "Zonas rígidas", m2: 1500 },
-    { tipo: "Líneas continuas", m2: 900 },
-    { tipo: "Líneas discontinuas", m2: 600 }
+    { tipo: "Zonas Rígidas", m2: 18000 },
+    { tipo: "Línea Separadora", m2: 18000 },
+    { tipo: "Paso Zebra (Peatonal)", m2: 18000 },
+    { tipo: "Línea de Parada", m2: 18000 },
+    { tipo: "Flecha Direccional", m2: 18000 }
   ]
 
   const maxM2Tipo = Math.max(...senalizacionTiposData.map((i) => i.m2))
@@ -209,18 +210,18 @@ export default function Home() {
   ]
 
   const capacitacionMensualData = [
-    { mes: "Enero", choferes: 2600 },
-    { mes: "Febrero", choferes: 2700 },
-    { mes: "Marzo", choferes: 2800 },
-    { mes: "Abril", choferes: 2550 },
-    { mes: "Mayo", choferes: 2500 },
-    { mes: "Junio", choferes: 2450 },
-    { mes: "Julio", choferes: 2400 },
-    { mes: "Agosto", choferes: 2350 },
-    { mes: "Septiembre", choferes: 2300 },
-    { mes: "Octubre", choferes: 2250 },
-    { mes: "Noviembre", choferes: 2200 },
-    { mes: "Diciembre", choferes: 2150 }
+    { mes: "Enero", choferes: 2600, vm: 1560, taxis: 624, tu: 416 },
+    { mes: "Febrero", choferes: 2700, vm: 1620, taxis: 648, tu: 432 },
+    { mes: "Marzo", choferes: 2800, vm: 1680, taxis: 672, tu: 448 },
+    { mes: "Abril", choferes: 2550, vm: 1530, taxis: 612, tu: 408 },
+    { mes: "Mayo", choferes: 2500, vm: 1500, taxis: 600, tu: 400 },
+    { mes: "Junio", choferes: 2450, vm: 1470, taxis: 588, tu: 392 },
+    { mes: "Julio", choferes: 2400, vm: 1440, taxis: 576, tu: 384 },
+    { mes: "Agosto", choferes: 2350, vm: 1410, taxis: 564, tu: 376 },
+    { mes: "Septiembre", choferes: 2300, vm: 1380, taxis: 552, tu: 368 },
+    { mes: "Octubre", choferes: 2250, vm: 1350, taxis: 540, tu: 360 },
+    { mes: "Noviembre", choferes: 2200, vm: 1320, taxis: 528, tu: 352 },
+    { mes: "Diciembre", choferes: 2150, vm: 1290, taxis: 516, tu: 344 }
   ]
 
   const filteredCapacitacionMensualData = capacitacionMensualData.filter((item) => {
@@ -233,10 +234,9 @@ export default function Home() {
     : 0
 
   const capacitacionTemasData = [
-    { tema: "Seguridad vial", choferes: 12000 },
-    { tema: "Protocolo de acoso sexual (buses)", choferes: 8000 },
-    { tema: "Cumplimiento de ordenanzas municipales", choferes: 6000 },
-    { tema: "Respeto cívica", choferes: 4600 }
+    { tema: "Programa de Seguridad Vial", choferes: 18000 },
+    { tema: "Protocolo de acoso sexual", choferes: 18000 },
+    { tema: "Talleres de Seguridad Vial", choferes: 18000 }
   ]
 
   const maxChoferesTema = Math.max(...capacitacionTemasData.map((i) => i.choferes))
@@ -253,10 +253,16 @@ export default function Home() {
         <CustomNavbar />
 
         <div className="container mx-auto px-4 py-16">
-          <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-5xl mx-auto"}>
+          <div className="text-center text-white mb-12">
+            <p className="text-sm uppercase tracking-[0.3em] text-blue-200 drop-shadow-[0_2px_6px_rgba(0,0,0,0.65)]">
+              Municipalidad Provincial de Piura
+            </p>
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold drop-shadow-[0_4px_14px_rgba(0,0,0,0.7)]">Visor de Indicadores de Transporte</h1>
+          </div>
+          <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-6xl mx-auto"}>
             {!selectedCategory ? (
-              // Main Category Selection - 3 Categories
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+              // Main Category Selection - 4 Categories
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto items-stretch">
                 <Card
                   className="w-full bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
                   onClick={() => setSelectedCategory("recaudacion")}
@@ -303,6 +309,23 @@ export default function Home() {
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
                         Tipos de señalización
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card
+                  className="w-full bg-white/95 backdrop-blur-sm hover:bg-purple-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedCategory("parque-automotor")}
+                >
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <Car className="w-16 h-16 text-purple-600 group-hover:text-white transition-colors" />
+                    <div>
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                        Parque Automotor Antigüedad
+                      </h3>
+                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+                        Análisis de antigüedad vehicular
                       </p>
                     </div>
                   </div>
@@ -831,6 +854,29 @@ export default function Home() {
                           </div>
                         </div>
 
+                        {/* Capacitaciones por temas */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            Capacitaciones por temas
+                          </h4>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {capacitacionTemasData.map((item) => (
+                              <div key={item.tema} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
+                                <p className="text-sm font-semibold text-gray-900">
+                                  {item.choferes.toLocaleString('es-PE')} Choferes capacitados en
+                                </p>
+                                <p className="text-xs text-gray-700 mt-1">{item.tema}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          <p className="mt-4 text-xs md:text-sm text-gray-700 font-semibold bg-green-50 border border-green-200 rounded-md px-3 py-2">
+                            Las capacitaciones del Programa de Seguridad Vial es obligatorio para obtener sus permisos de circulación
+                          </p>
+                        </div>
+
                         {/* Capacitaciones por modo de transporte */}
                         <div className="space-y-3">
                           <h3 className="text-xl font-bold text-gray-900">Capacitaciones por modo de transporte</h3>
@@ -846,11 +892,11 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Gráfico de barras con tabla por mes */}
+                        {/* Total de Choferes capacitados por mes */}
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-green-600" />
-                            Gráfico de barras con tabla por mes
+                            Total de Choferes capacitados por mes
                           </h4>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -873,13 +919,19 @@ export default function Home() {
                                 <thead>
                                   <tr className="border-b">
                                     <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Choferes capacitados</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Vehículo Menores</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Taxis</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Transporte Urbano</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de Choferes capacitados por mes</th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {filteredCapacitacionMensualData.map((item) => (
                                     <tr key={item.mes} className="border-b hover:bg-gray-50">
                                       <td className="py-2 px-2 text-gray-700">{item.mes}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.vm.toLocaleString('es-PE')}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.taxis.toLocaleString('es-PE')}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.tu.toLocaleString('es-PE')}</td>
                                       <td className="py-2 px-2 text-right font-medium text-gray-900">{item.choferes.toLocaleString('es-PE')}</td>
                                     </tr>
                                   ))}
@@ -887,33 +939,6 @@ export default function Home() {
                               </table>
                             </div>
                           </div>
-                        </div>
-
-                        {/* Capacitaciones por temas */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-600" />
-                            Capacitaciones por temas
-                          </h4>
-
-                          <div className="space-y-3">
-                            {capacitacionTemasData.map((item) => (
-                              <div key={item.tema} className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-600 w-48">{item.tema}</span>
-                                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
-                                  <div
-                                    className="bg-green-500 h-full rounded-full transition-all"
-                                    style={{ width: `${(item.choferes / maxChoferesTema) * 100}%` }}
-                                  />
-                                </div>
-                                <span className="w-24 text-right text-xs font-semibold text-gray-700">{item.choferes.toLocaleString('es-PE')}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <p className="mt-4 text-xs md:text-sm text-gray-700 font-semibold bg-green-50 border border-green-200 rounded-md px-3 py-2">
-                            Las capacitaciones es obligatorio para obtener sus permisos de circulación
-                          </p>
                         </div>
                       </Card>
                     )}
@@ -1066,11 +1091,11 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Gráfico de barras / tabla por mes */}
+                        {/* Registro de Mantenimiento de Señalización Horizontal por Mes */}
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-orange-600" />
-                            Gráfico de barras / tabla por mes
+                            Registro de Mantenimiento de Señalización Horizontal por Mes
                           </h4>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1109,26 +1134,30 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Señalización por tipo */}
+                        {/* Registro de Mantenimiento de Señalización Horizontal por tipo */}
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-orange-600" />
-                            Señalización por tipo
+                            Registro de Mantenimiento de Señalización Horizontal por tipo
                           </h4>
 
-                          <div className="space-y-3">
-                            {senalizacionTiposData.map((item) => (
-                              <div key={item.tipo} className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-600 w-36">{item.tipo}</span>
-                                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
-                                  <div
-                                    className="bg-orange-500 h-full rounded-full transition-all"
-                                    style={{ width: `${(item.m2 / maxM2Tipo) * 100}%` }}
-                                  />
-                                </div>
-                                <span className="w-20 text-right text-xs font-semibold text-gray-700">{item.m2.toLocaleString('es-PE')} m²</span>
-                              </div>
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                              <thead>
+                                <tr className="border-b">
+                                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Tipo</th>
+                                  <th className="text-right py-2 px-2 font-semibold text-gray-700">M2</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {senalizacionTiposData.map((item) => (
+                                  <tr key={item.tipo} className="border-b hover:bg-gray-50">
+                                    <td className="py-2 px-2 text-gray-700">{item.tipo}</td>
+                                    <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </Card>
