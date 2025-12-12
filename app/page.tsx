@@ -235,7 +235,7 @@ export default function Home() {
 
   const capacitacionTemasData = [
     { tema: "Programa de Seguridad Vial", choferes: 18000 },
-    { tema: "Protocolo de acoso sexual", choferes: 18000 },
+    { tema: "Protocolo de Acoso Sexual", choferes: 18000 },
     { tema: "Talleres de Seguridad Vial", choferes: 18000 }
   ]
 
@@ -1091,49 +1091,6 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Registro de Mantenimiento de Señalización Horizontal por Mes */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-orange-600" />
-                            Registro de Mantenimiento de Señalización Horizontal por Mes
-                          </h4>
-
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              {filteredSenalizacionMensualData.map((item) => (
-                                <div key={item.mes} className="flex items-center gap-2">
-                                  <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
-                                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
-                                    <div
-                                      className="bg-orange-500 h-full rounded-full transition-all"
-                                      style={{ width: `${maxM2Mensual ? (item.m2 / maxM2Mensual) * 100 : 0}%` }}
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-xs">
-                                <thead>
-                                  <tr className="border-b">
-                                    <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">M2 intervenidos</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {filteredSenalizacionMensualData.map((item) => (
-                                    <tr key={item.mes} className="border-b hover:bg-gray-50">
-                                      <td className="py-2 px-2 text-gray-700">{item.mes}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-
                         {/* Registro de Mantenimiento de Señalización Horizontal por tipo */}
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -1141,18 +1098,37 @@ export default function Home() {
                             Registro de Mantenimiento de Señalización Horizontal por tipo
                           </h4>
 
+                          <div className="grid grid-cols-1 gap-3">
+                            {senalizacionTiposData.map((item) => (
+                              <div key={item.tipo} className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3 flex items-center justify-between">
+                                <div>
+                                  <p className="text-lg font-bold text-gray-900">{item.m2.toLocaleString('es-PE')} m2</p>
+                                  <p className="text-sm text-orange-700 font-medium">{item.tipo}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Registro de Mantenimiento de Señalización Horizontal por Mes */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-orange-600" />
+                            Registro de Mantenimiento de Señalización Horizontal por Mes
+                          </h4>
+
                           <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                               <thead>
                                 <tr className="border-b">
-                                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Tipo</th>
-                                  <th className="text-right py-2 px-2 font-semibold text-gray-700">M2</th>
+                                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                                  <th className="text-right py-2 px-2 font-semibold text-gray-700">M2 intervenidos</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {senalizacionTiposData.map((item) => (
-                                  <tr key={item.tipo} className="border-b hover:bg-gray-50">
-                                    <td className="py-2 px-2 text-gray-700">{item.tipo}</td>
+                                {filteredSenalizacionMensualData.map((item) => (
+                                  <tr key={item.mes} className="border-b hover:bg-gray-50">
+                                    <td className="py-2 px-2 text-gray-700">{item.mes}</td>
                                     <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
                                   </tr>
                                 ))}
