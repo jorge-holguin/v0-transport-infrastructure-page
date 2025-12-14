@@ -22,29 +22,35 @@ interface DetalleNivel2 {
 
 interface SubgerenciaCardProps {
   nombre: string
+  titulo?: string
   year: string
   metrica: "soles" | "cantidad"
   estado: string
   totalSoles?: number
   totalCantidad?: number
+  cantidadLabel?: string
   metaSoles?: number
   metaCantidad?: number
   detalles: DetalleNivel2[]
   icon?: React.ReactNode
+  showDonut?: boolean
 }
 
 export function SubgerenciaCard({
   nombre,
+  titulo,
   year,
   metrica,
   estado,
   totalSoles,
   totalCantidad,
+  cantidadLabel = "trámites",
   metaSoles,
   metaCantidad,
   detalles,
-  icon
-}: SubgerenciaCardProps) {
+  icon,
+  showDonut = true
+}: Readonly<SubgerenciaCardProps>) {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   // Check if soles data is available
@@ -91,7 +97,7 @@ export function SubgerenciaCard({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-bold text-gray-900 text-base group-hover:text-blue-600 transition-colors leading-tight">
-                {nombre}
+                {titulo ?? nombre}
               </h3>
             </div>
             {icon && (
@@ -112,7 +118,7 @@ export function SubgerenciaCard({
               ) : (
                 <>
                   <DollarSign className="w-3 h-3" />
-                  <span>Recaudación</span>
+                  <span>Monto</span>
                 </>
               )}
             </div>
@@ -120,7 +126,7 @@ export function SubgerenciaCard({
               {displayValue}
             </p>
             {hasSolesData && metrica === "soles" && !!totalCantidad && (
-              <p className="text-xs text-gray-500">{totalCantidad.toLocaleString('es-PE')} trámites</p>
+              <p className="text-xs text-gray-500">{totalCantidad.toLocaleString('es-PE')} {cantidadLabel}</p>
             )}
             {metrica === "cantidad" && hasSolesData && !!totalSoles && (
               <p className="text-xs text-gray-500">S/ {totalSoles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
@@ -128,7 +134,7 @@ export function SubgerenciaCard({
           </div>
 
           {/* Gráfico de torta Recaudado vs Por recaudar */}
-          {hasMetaData && (
+          {showDonut && hasMetaData && (
             <div className="mt-4 flex items-center gap-4">
               <div className="w-24 h-24">
                 <ResponsiveContainer>
@@ -142,7 +148,7 @@ export function SubgerenciaCard({
                       stroke="transparent"
                     >
                       <Cell key="recaudado" fill="#16a34a" />
-                      <Cell key="por-recaudar" fill="#f97316" />
+                      <Cell key="por-recaudar" fill="#ef4444" />
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
@@ -151,13 +157,13 @@ export function SubgerenciaCard({
                 <div className="flex items-center gap-2">
                   <span className="inline-block w-3 h-3 rounded-full bg-green-500" />
                   <span>
-                    Recaudado: {recaudadoPercent}%
+                    Monto Recaudado: {recaudadoPercent}%
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full bg-orange-500" />
+                  <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
                   <span>
-                    Por recaudar: {porRecaudarPercent}%
+                    Monto Pendiente de Recaudación: {porRecaudarPercent}%
                   </span>
                 </div>
               </div>

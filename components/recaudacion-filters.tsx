@@ -16,6 +16,7 @@ interface RecaudacionFiltersProps {
   selectedSubgerencias: string[]
   onSubgerenciasChange: (subgerencias: string[]) => void
   availableSubgerencias: string[]
+  variant?: "card" | "inline"
 }
 
 export function RecaudacionFilters({
@@ -29,65 +30,73 @@ export function RecaudacionFilters({
   onMetricaChange,
   selectedSubgerencias,
   onSubgerenciasChange,
-  availableSubgerencias
-}: RecaudacionFiltersProps) {
-  return (
-    <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-2 border-blue-200 shadow-lg">
-      <div className="space-y-6">
+  availableSubgerencias,
+  variant = "card"
+}: Readonly<RecaudacionFiltersProps>) {
+  const content = (
+    <>
+      {variant === "card" && (
         <div className="flex items-center gap-2 text-gray-900">
           <Filter className="w-5 h-5 text-blue-600" />
           <h3 className="font-bold text-lg">Filtros Globales</h3>
         </div>
+      )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Año - Obligatorio */}
-          <div>
+      <div className={variant === "card" ? "grid grid-cols-1 md:grid-cols-3 gap-4" : "flex flex-wrap items-center justify-end gap-2 md:gap-3"}>
+        <div className={variant === "card" ? "" : "flex items-center gap-1"}>
+          {variant === "card" ? (
             <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-600" />
               Año <span className="text-red-500">*</span>
             </label>
-            <Select value={selectedYear} onValueChange={onYearChange}>
-              <SelectTrigger className="bg-white border-blue-300 hover:border-blue-500 transition-colors">
-                <SelectValue placeholder="Seleccionar año" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
-                <SelectItem value="2023">2023</SelectItem>
-                <SelectItem value="2022">2022</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          ) : (
+            <span className="font-semibold text-white">Año:</span>
+          )}
+          <Select value={selectedYear} onValueChange={onYearChange}>
+            <SelectTrigger className={variant === "card" ? "bg-white border-blue-300 hover:border-blue-500 transition-colors" : "h-7 w-[84px] border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"}>
+              <SelectValue placeholder="Seleccionar año" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2025">2025</SelectItem>
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Mes */}
-          <div>
+        <div className={variant === "card" ? "" : "flex items-center gap-1"}>
+          {variant === "card" ? (
             <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-blue-600" />
               Mes
             </label>
-            <Select value={selectedMonth} onValueChange={onMonthChange}>
-              <SelectTrigger className="bg-white border-blue-300 hover:border-blue-500 transition-colors">
-                <SelectValue placeholder="Seleccionar mes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="enero">Enero</SelectItem>
-                <SelectItem value="febrero">Febrero</SelectItem>
-                <SelectItem value="marzo">Marzo</SelectItem>
-                <SelectItem value="abril">Abril</SelectItem>
-                <SelectItem value="mayo">Mayo</SelectItem>
-                <SelectItem value="junio">Junio</SelectItem>
-                <SelectItem value="julio">Julio</SelectItem>
-                <SelectItem value="agosto">Agosto</SelectItem>
-                <SelectItem value="septiembre">Septiembre</SelectItem>
-                <SelectItem value="octubre">Octubre</SelectItem>
-                <SelectItem value="noviembre">Noviembre</SelectItem>
-                <SelectItem value="diciembre">Diciembre</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          ) : (
+            <span className="font-semibold text-white">Mes:</span>
+          )}
+          <Select value={selectedMonth} onValueChange={onMonthChange}>
+            <SelectTrigger className={variant === "card" ? "bg-white border-blue-300 hover:border-blue-500 transition-colors" : "h-7 w-[110px] border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"}>
+              <SelectValue placeholder="Seleccionar mes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Todos">Todos</SelectItem>
+              <SelectItem value="enero">Enero</SelectItem>
+              <SelectItem value="febrero">Febrero</SelectItem>
+              <SelectItem value="marzo">Marzo</SelectItem>
+              <SelectItem value="abril">Abril</SelectItem>
+              <SelectItem value="mayo">Mayo</SelectItem>
+              <SelectItem value="junio">Junio</SelectItem>
+              <SelectItem value="julio">Julio</SelectItem>
+              <SelectItem value="agosto">Agosto</SelectItem>
+              <SelectItem value="septiembre">Septiembre</SelectItem>
+              <SelectItem value="octubre">Octubre</SelectItem>
+              <SelectItem value="noviembre">Noviembre</SelectItem>
+              <SelectItem value="diciembre">Diciembre</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Métrica - Only Soles */}
+        {variant === "card" && (
           <div>
             <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-blue-600" />
@@ -102,7 +111,19 @@ export function RecaudacionFilters({
               </button>
             </div>
           </div>
-        </div>
+        )}
+      </div>
+    </>
+  )
+
+  if (variant === "inline") {
+    return content
+  }
+
+  return (
+    <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-2 border-blue-200 shadow-lg">
+      <div className="space-y-6">
+        {content}
       </div>
     </Card>
   )

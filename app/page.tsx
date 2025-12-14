@@ -12,7 +12,6 @@ import { Building, Users, ShieldCheck, GraduationCap, Car } from "lucide-react"
 import { CustomNavbar } from "@/components/custom-navbar"
 import { TipoDetailModal } from "@/components/tipo-detail-modal"
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -27,7 +26,6 @@ export default function Home() {
     "Subgerencia de Fiscalización",
     "Subgerencia de Tránsito y Movilidad Urbana"
   ])
-  const [tipoRecaudacion, setTipoRecaudacion] = useState<"cobradas" | "por-cobrar">("cobradas")
   const [senalStep, setSenalStep] = useState<"subgerencia" | "horizontal" | "detalle">("subgerencia")
   const [capStep, setCapStep] = useState<"subgerencia" | "detalle">("subgerencia")
 
@@ -127,8 +125,7 @@ export default function Home() {
   // Usan exactamente los mismos montos y metas que las tarjetas de subgerencia
   const totalAvance = subgerenciasData.reduce((sum, sub) => {
     const value = sub.soles
-    const adjustedValue = tipoRecaudacion === "cobradas" ? value : value * 0.3
-    return sum + adjustedValue
+    return sum + value
   }, 0)
 
   const totalMeta = subgerenciasData.reduce((sum, sub) => sum + sub.metaSoles, 0)
@@ -155,30 +152,55 @@ export default function Home() {
     { mes: "Diciembre", proporcion: 0.0 }
   ]
 
-  const monthlyData = monthlyBaseData.map((item) => {
-    const recaudado = totalAvance * item.proporcion
-    const porRecaudar = (totalMeta * item.proporcion) - recaudado
-    return {
-      mes: item.mes,
-      recaudado: recaudado,
-      porRecaudar: Math.max(porRecaudar, 0)
+  const distributeByProportion = (total: number, base: { mes: string; proporcion: number }[]) => {
+    const totalCents = Math.round(total * 100)
+    const cents = base.map((b) => Math.floor(totalCents * b.proporcion))
+    const baseSum = cents.reduce((acc, v) => acc + v, 0)
+    let remaining = Math.max(0, totalCents - baseSum)
+    let i = 0
+    while (remaining > 0 && cents.length > 0) {
+      cents[i % cents.length] += 1
+      remaining -= 1
+      i += 1
     }
-  })
+    return cents
+  }
+
+  const totalPendiente = Math.max(totalMeta - totalAvance, 0)
+  const recaudadoCentsByMonth = distributeByProportion(totalAvance, monthlyBaseData)
+  const pendienteCentsByMonth = distributeByProportion(totalPendiente, monthlyBaseData)
+
+  const monthlyData = (() => {
+    let acumuladoPendienteCents = 0
+    return monthlyBaseData.map((item, idx) => {
+      const recaudadoCents = recaudadoCentsByMonth[idx] || 0
+      const pendienteCents = pendienteCentsByMonth[idx] || 0
+      acumuladoPendienteCents += pendienteCents
+      const totalProyectadoCents = recaudadoCents + pendienteCents
+      return {
+        mes: item.mes,
+        recaudado: recaudadoCents / 100,
+        porRecaudar: pendienteCents / 100,
+        acumuladoPendiente: acumuladoPendienteCents / 100,
+        totalProyectado: totalProyectadoCents / 100
+      }
+    })
+  })()
 
   // Datos de ejemplo para Señalización Horizontal (solo m²)
   const senalizacionMensualData = [
-    { mes: "Enero", m2: 420 },
-    { mes: "Febrero", m2: 430 },
-    { mes: "Marzo", m2: 460 },
-    { mes: "Abril", m2: 480 },
-    { mes: "Mayo", m2: 440 },
-    { mes: "Junio", m2: 410 },
-    { mes: "Julio", m2: 400 },
-    { mes: "Agosto", m2: 390 },
-    { mes: "Septiembre", m2: 380 },
-    { mes: "Octubre", m2: 370 },
-    { mes: "Noviembre", m2: 360 },
-    { mes: "Diciembre", m2: 360 }
+    { mes: "Enero", m2: 4200 },
+    { mes: "Febrero", m2: 4300 },
+    { mes: "Marzo", m2: 4600 },
+    { mes: "Abril", m2: 4800 },
+    { mes: "Mayo", m2: 4400 },
+    { mes: "Junio", m2: 4100 },
+    { mes: "Julio", m2: 4000 },
+    { mes: "Agosto", m2: 3900 },
+    { mes: "Septiembre", m2: 3800 },
+    { mes: "Octubre", m2: 3700 },
+    { mes: "Noviembre", m2: 3600 },
+    { mes: "Diciembre", m2: 4600 }
   ]
 
   const filteredSenalizacionMensualData = senalizacionMensualData.filter((item) => {
@@ -190,39 +212,57 @@ export default function Home() {
     ? Math.max(...filteredSenalizacionMensualData.map((i) => i.m2))
     : 0
 
-  const senalizacionTiposData = [
-    { tipo: "Zonas Rígidas", m2: 18000 },
-    { tipo: "Línea Separadora", m2: 18000 },
-    { tipo: "Paso Zebra (Peatonal)", m2: 18000 },
-    { tipo: "Línea de Parada", m2: 18000 },
-    { tipo: "Flecha Direccional", m2: 18000 }
+  const totalM2Senalizacion = filteredSenalizacionMensualData.reduce((acc, item) => acc + item.m2, 0)
+
+  const senalTiposConfig = [
+    { tipo: "Zonas Rígidas", weight: 0.22 },
+    { tipo: "Línea Separadora", weight: 0.21 },
+    { tipo: "Paso Zebra (Peatonal)", weight: 0.2 },
+    { tipo: "Línea de Parada", weight: 0.19 },
+    { tipo: "Flecha Direccional", weight: 0.18 }
   ]
+
+  const distributedSenalTipos = (() => {
+    const base = senalTiposConfig.map((t) => Math.floor(totalM2Senalizacion * t.weight))
+    const baseSum = base.reduce((acc, v) => acc + v, 0)
+    let remaining = Math.max(0, totalM2Senalizacion - baseSum)
+    const next = [...base]
+    let i = 0
+    while (remaining > 0 && next.length > 0) {
+      next[i % next.length] += 1
+      remaining -= 1
+      i += 1
+    }
+    return next
+  })()
+
+  const senalizacionTiposData = senalTiposConfig.map((t, idx) => ({
+    tipo: t.tipo,
+    m2: distributedSenalTipos[idx] || 0
+  }))
 
   const maxM2Tipo = Math.max(...senalizacionTiposData.map((i) => i.m2))
 
   // Datos de ejemplo para Capacitación
-  const totalCapacitaciones = 30600
-
-  const capacitacionPorModo = [
-    { modo: "Vehículos menores", cantidad: 18000 },
-    { modo: "Servicio de Taxi", cantidad: 7200 },
-    { modo: "Transporte urbano", cantidad: 5400 }
+  const capacitacionMensualBaseData = [
+    { mes: "Enero", vm: 1560, taxis: 624, tu: 416 },
+    { mes: "Febrero", vm: 1620, taxis: 648, tu: 432 },
+    { mes: "Marzo", vm: 1680, taxis: 672, tu: 448 },
+    { mes: "Abril", vm: 1530, taxis: 612, tu: 408 },
+    { mes: "Mayo", vm: 1500, taxis: 600, tu: 400 },
+    { mes: "Junio", vm: 1470, taxis: 588, tu: 392 },
+    { mes: "Julio", vm: 1440, taxis: 576, tu: 384 },
+    { mes: "Agosto", vm: 1410, taxis: 564, tu: 376 },
+    { mes: "Septiembre", vm: 1380, taxis: 552, tu: 368 },
+    { mes: "Octubre", vm: 1350, taxis: 540, tu: 360 },
+    { mes: "Noviembre", vm: 1320, taxis: 528, tu: 352 },
+    { mes: "Diciembre", vm: 1290, taxis: 516, tu: 344 }
   ]
 
-  const capacitacionMensualData = [
-    { mes: "Enero", choferes: 2600, vm: 1560, taxis: 624, tu: 416 },
-    { mes: "Febrero", choferes: 2700, vm: 1620, taxis: 648, tu: 432 },
-    { mes: "Marzo", choferes: 2800, vm: 1680, taxis: 672, tu: 448 },
-    { mes: "Abril", choferes: 2550, vm: 1530, taxis: 612, tu: 408 },
-    { mes: "Mayo", choferes: 2500, vm: 1500, taxis: 600, tu: 400 },
-    { mes: "Junio", choferes: 2450, vm: 1470, taxis: 588, tu: 392 },
-    { mes: "Julio", choferes: 2400, vm: 1440, taxis: 576, tu: 384 },
-    { mes: "Agosto", choferes: 2350, vm: 1410, taxis: 564, tu: 376 },
-    { mes: "Septiembre", choferes: 2300, vm: 1380, taxis: 552, tu: 368 },
-    { mes: "Octubre", choferes: 2250, vm: 1350, taxis: 540, tu: 360 },
-    { mes: "Noviembre", choferes: 2200, vm: 1320, taxis: 528, tu: 352 },
-    { mes: "Diciembre", choferes: 2150, vm: 1290, taxis: 516, tu: 344 }
-  ]
+  const capacitacionMensualData = capacitacionMensualBaseData.map((item) => ({
+    ...item,
+    choferes: item.vm + item.taxis + item.tu
+  }))
 
   const filteredCapacitacionMensualData = capacitacionMensualData.filter((item) => {
     if (capFilterPeriodos.length === 0 || capFilterPeriodos.includes("Todos")) return true
@@ -233,11 +273,47 @@ export default function Home() {
     ? Math.max(...filteredCapacitacionMensualData.map((i) => i.choferes))
     : 0
 
-  const capacitacionTemasData = [
-    { tema: "Programa de Seguridad Vial", choferes: 18000 },
-    { tema: "Protocolo de Acoso Sexual", choferes: 18000 },
-    { tema: "Talleres de Seguridad Vial", choferes: 18000 }
+  const totalCapacitaciones = filteredCapacitacionMensualData.reduce((acc, item) => acc + item.choferes, 0)
+
+  const capacitacionPorModo = [
+    {
+      modo: "Vehículos menores",
+      cantidad: filteredCapacitacionMensualData.reduce((acc, item) => acc + item.vm, 0)
+    },
+    {
+      modo: "Servicio de Taxi",
+      cantidad: filteredCapacitacionMensualData.reduce((acc, item) => acc + item.taxis, 0)
+    },
+    {
+      modo: "Transporte urbano",
+      cantidad: filteredCapacitacionMensualData.reduce((acc, item) => acc + item.tu, 0)
+    }
   ]
+
+  const capacitacionTemasConfig = [
+    { tema: "Programa de Seguridad Vial", weight: 0.4 },
+    { tema: "Protocolo de Acoso Sexual", weight: 0.3 },
+    { tema: "Talleres de Seguridad Vial", weight: 0.3 }
+  ]
+
+  const distributedCapTemas = (() => {
+    const base = capacitacionTemasConfig.map((t) => Math.floor(totalCapacitaciones * t.weight))
+    const baseSum = base.reduce((acc, v) => acc + v, 0)
+    let remaining = Math.max(0, totalCapacitaciones - baseSum)
+    const next = [...base]
+    let i = 0
+    while (remaining > 0 && next.length > 0) {
+      next[i % next.length] += 1
+      remaining -= 1
+      i += 1
+    }
+    return next
+  })()
+
+  const capacitacionTemasData = capacitacionTemasConfig.map((t, idx) => ({
+    tema: t.tema,
+    choferes: distributedCapTemas[idx] || 0
+  }))
 
   const maxChoferesTema = Math.max(...capacitacionTemasData.map((i) => i.choferes))
 
@@ -343,65 +419,43 @@ export default function Home() {
 
                 {selectedCategory === "recaudacion" && (
                   <div className="space-y-6">
+                    {/* Gráfico Comparativo General */}
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
                       <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-2">
+                        <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-1">
                           <CreditCard className="w-8 h-8 text-blue-600" />
                           Indicadores de la Gerencia de Transportes
                         </h3>
-                        <p className="text-lg text-gray-600 ml-11">Primera Versión del Tablero de Indicadores</p>
+                        <p className="text-lg text-gray-600 ml-11">Recaudación</p>
                       </div>
-                      
-                      {/* Filtros Globales */}
-                      <RecaudacionFilters
-                        selectedYear={selectedYear}
-                        onYearChange={setSelectedYear}
-                        selectedEstado={selectedEstado}
-                        onEstadoChange={setSelectedEstado}
-                        selectedMetrica={selectedMetrica}
-                        onMetricaChange={setSelectedMetrica}
-                        selectedSubgerencias={selectedSubgerencias}
-                        onSubgerenciasChange={setSelectedSubgerencias}
-                        availableSubgerencias={[
-                          "Subgerencia de Transportes",
-                          "Subgerencia de Fiscalización",
-                          "Subgerencia de Tránsito y Movilidad Urbana"
-                        ]}
-                        selectedMonth={selectedMonth}
-                        onMonthChange={setSelectedMonth}
-                      />
 
-                    </Card>
-
-                    {/* Gráfico Comparativo General */}
-                    <Card className="bg-white/95 backdrop-blur-sm p-8">
                       <h4 className="text-lg font-semibold text-gray-900 mb-6">
-                        Resumen General de Recaudación
+                        Recaudación Total por la Gerencia de Transporte y Movilidad Urbana
                       </h4>
                       
                       {/* Total destacado */}
                       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-lg text-white shadow-lg mb-6">
                         <div className="flex items-center justify-between flex-wrap gap-4">
                           <div className="flex gap-6">
-                            <div>
-                              <p className="text-blue-100 text-xs font-medium mb-1">Total Recaudado</p>
+                            <div className="rounded-lg bg-green-500/20 border border-green-300/30 px-4 py-3">
+                              <p className="text-blue-100 text-xs font-medium mb-1">Monto Recaudado</p>
                               <p className="text-2xl font-bold">
                                 S/ {totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div>
-                              <p className="text-blue-100 text-xs font-medium mb-1">Total Por Recaudar</p>
+                            <div className="rounded-lg bg-red-500/20 border border-red-300/30 px-4 py-3">
+                              <p className="text-blue-100 text-xs font-medium mb-1">Monto Pendiente de Recaudación</p>
                               <p className="text-2xl font-bold">
                                 S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div>
-                              <p className="text-blue-100 text-xs font-medium mb-1">Meta Total</p>
+                            <div className="rounded-lg bg-sky-500/20 border border-sky-300/30 px-4 py-3">
+                              <p className="text-blue-100 text-xs font-medium mb-1">Recaudación Total Proyectada</p>
                               <p className="text-2xl font-bold">
                                 S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div>
+                            <div className="rounded-lg bg-white/10 border border-white/20 px-4 py-3">
                               <p className="text-blue-100 text-xs font-medium mb-1">Cumplimiento</p>
                               <p className="text-2xl font-bold">
                                 {(totalMeta > 0 ? ((totalAvance / totalMeta) * 100) : 0).toFixed(1)}%
@@ -409,26 +463,25 @@ export default function Home() {
                             </div>
                           </div>
                           <div className="flex items-center gap-4 text-xs">
-                            <div><span className="font-semibold">Año:</span> {selectedYear}</div>
+                            <RecaudacionFilters
+                              selectedYear={selectedYear}
+                              onYearChange={setSelectedYear}
+                              selectedEstado={selectedEstado}
+                              onEstadoChange={setSelectedEstado}
+                              selectedMetrica={selectedMetrica}
+                              onMetricaChange={setSelectedMetrica}
+                              selectedSubgerencias={selectedSubgerencias}
+                              onSubgerenciasChange={setSelectedSubgerencias}
+                              availableSubgerencias={[
+                                "Subgerencia de Transportes",
+                                "Subgerencia de Fiscalización",
+                                "Subgerencia de Tránsito y Movilidad Urbana"
+                              ]}
+                              selectedMonth={selectedMonth}
+                              onMonthChange={setSelectedMonth}
+                              variant="inline"
+                            />
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Selector de Tipo de Recaudación */}
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200 shadow-sm mb-6">
-                        <div className="flex items-center gap-4">
-                          <label className="text-sm font-bold text-gray-900 whitespace-nowrap">
-                            Tipo de Recaudación:
-                          </label>
-                          <Select value={tipoRecaudacion} onValueChange={(value: "cobradas" | "por-cobrar") => setTipoRecaudacion(value)}>
-                            <SelectTrigger className="max-w-xs bg-white border-blue-300 hover:border-blue-500 transition-colors">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="cobradas">Cuentas Cobradas</SelectItem>
-                              <SelectItem value="por-cobrar">Cuentas por Cobrar</SelectItem>
-                            </SelectContent>
-                          </Select>
                         </div>
                       </div>
 
@@ -455,7 +508,7 @@ export default function Home() {
                                     labelLine={false}
                                   >
                                     <Cell fill="#16a34a" />
-                                    <Cell fill="#f97316" />
+                                    <Cell fill="#ef4444" />
                                   </Pie>
                                 </PieChart>
                               </ResponsiveContainer>
@@ -466,7 +519,7 @@ export default function Home() {
                                 <span className="text-sm font-medium">Recaudado</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="inline-block w-4 h-4 rounded-full bg-orange-500" />
+                                <span className="inline-block w-4 h-4 rounded-full bg-red-500" />
                                 <span className="text-sm font-medium">Por Recaudar</span>
                               </div>
                             </div>
@@ -490,7 +543,7 @@ export default function Home() {
                                 />
                                 <Legend wrapperStyle={{ fontSize: '12px' }} />
                                 <Bar dataKey="recaudado" stackId="a" fill="#16a34a" name="Recaudado" />
-                                <Bar dataKey="porRecaudar" stackId="a" fill="#f97316" name="Por Recaudar" />
+                                <Bar dataKey="porRecaudar" stackId="a" fill="#ef4444" name="Por Recaudar" />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
@@ -499,15 +552,16 @@ export default function Home() {
 
                       {/* Tabla de Recaudación por Mes */}
                       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-4">Recaudación Mensual</h5>
+                        <h5 className="text-sm font-semibold text-gray-700 mb-4">Recaudación Mensual por la Gerencia de Transporte y Movilidad Urbana</h5>
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-gray-200">
                                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Mes</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Recaudado</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Por Recaudar</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Total</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Recaudado</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Pendiente de Recaudación</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Acumulado Pendiente de Recaudación</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Recaudación Total Proyectada</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -517,11 +571,14 @@ export default function Home() {
                                   <td className="py-3 px-4 text-right font-medium text-green-600">
                                     S/ {item.recaudado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                   </td>
-                                  <td className="py-3 px-4 text-right font-medium text-orange-600">
+                                  <td className="py-3 px-4 text-right font-medium text-red-600">
                                     S/ {item.porRecaudar.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                   </td>
-                                  <td className="py-3 px-4 text-right font-bold text-gray-900">
-                                    S/ {(item.recaudado + item.porRecaudar).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  <td className="py-3 px-4 text-right font-semibold text-gray-900">
+                                    S/ {item.acumuladoPendiente.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </td>
+                                  <td className="py-3 px-4 text-right font-bold text-sky-700">
+                                    S/ {item.totalProyectado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                   </td>
                                 </tr>
                               ))}
@@ -532,10 +589,13 @@ export default function Home() {
                                 <td className="py-3 px-4 text-right text-green-600">
                                   S/ {totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </td>
-                                <td className="py-3 px-4 text-right text-orange-600">
+                                <td className="py-3 px-4 text-right text-red-600">
                                   S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </td>
                                 <td className="py-3 px-4 text-right text-gray-900">
+                                  S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td className="py-3 px-4 text-right text-sky-700">
                                   S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </td>
                               </tr>
@@ -547,19 +607,44 @@ export default function Home() {
 
                     {/* Tarjetas de Nivel 1 - Subgerencias */}
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-6">
-                        Nivel 1 - Resumen por Subgerencia
-                      </h4>
+                      <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
+                        <h4 className="text-lg font-semibold text-red-600">
+                          Recaudación Total por las SubGerencias de la Gerencia de Transporte y Movilidad Urbana
+                        </h4>
+
+                        <div className="bg-gradient-to-r from-emerald-600 to-green-600 p-3 rounded-lg text-white shadow-md">
+                          <RecaudacionFilters
+                            selectedYear={selectedYear}
+                            onYearChange={setSelectedYear}
+                            selectedEstado={selectedEstado}
+                            onEstadoChange={setSelectedEstado}
+                            selectedMetrica={selectedMetrica}
+                            onMetricaChange={setSelectedMetrica}
+                            selectedSubgerencias={selectedSubgerencias}
+                            onSubgerenciasChange={setSelectedSubgerencias}
+                            availableSubgerencias={[
+                              "Subgerencia de Transportes",
+                              "Subgerencia de Fiscalización",
+                              "Subgerencia de Tránsito y Movilidad Urbana"
+                            ]}
+                            selectedMonth={selectedMonth}
+                            onMonthChange={setSelectedMonth}
+                            variant="inline"
+                          />
+                        </div>
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Subgerencia de Fiscalización */}
                         {selectedSubgerencias.includes("Subgerencia de Fiscalización") && (
                           <SubgerenciaCard
                             nombre="Subgerencia de Fiscalización"
+                            titulo="Monto recaudado por Subgerencia de Fiscalización"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
                             totalSoles={145000}
                             totalCantidad={850}
+                            cantidadLabel="Actas de Control"
                             metaSoles={180000}
                             metaCantidad={1100}
                             icon={<ShieldCheck className="w-6 h-6" />}
@@ -585,6 +670,7 @@ export default function Home() {
                         {selectedSubgerencias.includes("Subgerencia de Transportes") && (
                           <SubgerenciaCard
                             nombre="Subgerencia de Transportes"
+                            titulo="Monto recaudado por Subgerencia de Transportes"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
@@ -592,6 +678,7 @@ export default function Home() {
                             totalCantidad={1450}
                             metaSoles={400000}
                             metaCantidad={2000}
+                            showDonut={false}
                             icon={<Building className="w-6 h-6" />}
                             detalles={[
                               { 
@@ -693,6 +780,7 @@ export default function Home() {
                         {selectedSubgerencias.includes("Subgerencia de Tránsito y Movilidad Urbana") && (
                           <SubgerenciaCard
                             nombre="Subgerencia de Tránsito y Movilidad Urbana"
+                            titulo="Monto recaudado por Subgerencia de Tránsito y Movilidad Urbana"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
@@ -700,6 +788,7 @@ export default function Home() {
                             totalCantidad={4680}
                             metaSoles={550000}
                             metaCantidad={5200}
+                            showDonut={false}
                             icon={<Users className="w-6 h-6" />}
                             detalles={[
                               { 
@@ -768,9 +857,9 @@ export default function Home() {
                         <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 rounded-lg text-white shadow-lg mb-2">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-green-100 text-xs font-medium mb-1">Total choferes capacitados</p>
+                              <p className="text-green-100 text-xs font-medium mb-1">Total personas capacitadas</p>
                               <p className="text-2xl font-bold">
-                                {totalCapacitaciones.toLocaleString('es-PE')} choferes capacitados
+                                {totalCapacitaciones.toLocaleString('es-PE')} personas capacitadas
                               </p>
                             </div>
                             <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
@@ -865,7 +954,7 @@ export default function Home() {
                             {capacitacionTemasData.map((item) => (
                               <div key={item.tema} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
                                 <p className="text-sm font-semibold text-gray-900">
-                                  {item.choferes.toLocaleString('es-PE')} Choferes capacitados en
+                                  {item.choferes.toLocaleString('es-PE')} Personas capacitadas en
                                 </p>
                                 <p className="text-xs text-gray-700 mt-1">{item.tema}</p>
                               </div>
@@ -884,7 +973,7 @@ export default function Home() {
                             {capacitacionPorModo.map((item) => (
                               <div key={item.modo} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
                                 <p className="text-sm font-semibold text-gray-900">
-                                  {item.cantidad.toLocaleString('es-PE')} choferes capacitados
+                                  {item.cantidad.toLocaleString('es-PE')} personas capacitadas
                                 </p>
                                 <p className="text-xs text-gray-700 mt-1">en {item.modo.toLowerCase()}</p>
                               </div>
@@ -896,7 +985,7 @@ export default function Home() {
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-green-600" />
-                            Total de Choferes capacitados por mes
+                            Total de Personas capacitadas por mes
                           </h4>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -922,7 +1011,7 @@ export default function Home() {
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Vehículo Menores</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Taxis</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Transporte Urbano</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de Choferes capacitados por mes</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de Personas capacitadas por mes</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1008,7 +1097,7 @@ export default function Home() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="text-orange-100 text-xs font-medium mb-1">Total intervenido</p>
-                              <p className="text-2xl font-bold">5,000 m²</p>
+                              <p className="text-2xl font-bold">{totalM2Senalizacion.toLocaleString("es-PE")} m²</p>
                             </div>
                             <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
                               <div className="flex items-center gap-1">
@@ -1091,49 +1180,51 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Registro de Mantenimiento de Señalización Horizontal por tipo */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-orange-600" />
-                            Registro de Mantenimiento de Señalización Horizontal por tipo
-                          </h4>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {/* Registro de Mantenimiento de Señalización Horizontal por tipo */}
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-orange-600" />
+                              Registro de Mantenimiento de Señalización Horizontal por tipo
+                            </h4>
 
-                          <div className="grid grid-cols-1 gap-3">
-                            {senalizacionTiposData.map((item) => (
-                              <div key={item.tipo} className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3 flex items-center justify-between">
-                                <div>
-                                  <p className="text-lg font-bold text-gray-900">{item.m2.toLocaleString('es-PE')} m2</p>
-                                  <p className="text-sm text-orange-700 font-medium">{item.tipo}</p>
+                            <div className="grid grid-cols-1 gap-3">
+                              {senalizacionTiposData.map((item) => (
+                                <div key={item.tipo} className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3 flex items-center justify-between">
+                                  <div>
+                                    <p className="text-lg font-bold text-gray-900">{item.m2.toLocaleString('es-PE')} m²</p>
+                                    <p className="text-sm text-orange-700 font-medium">{item.tipo}</p>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Registro de Mantenimiento de Señalización Horizontal por Mes */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-orange-600" />
-                            Registro de Mantenimiento de Señalización Horizontal por Mes
-                          </h4>
+                          {/* Registro de Mantenimiento de Señalización Horizontal por Mes */}
+                          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-orange-600" />
+                              Registro de Mantenimiento de Señalización Horizontal por Mes
+                            </h4>
 
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-xs">
-                              <thead>
-                                <tr className="border-b">
-                                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                                  <th className="text-right py-2 px-2 font-semibold text-gray-700">M2 intervenidos</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {filteredSenalizacionMensualData.map((item) => (
-                                  <tr key={item.mes} className="border-b hover:bg-gray-50">
-                                    <td className="py-2 px-2 text-gray-700">{item.mes}</td>
-                                    <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">M2 intervenidos</th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {filteredSenalizacionMensualData.map((item) => (
+                                    <tr key={item.mes} className="border-b hover:bg-gray-50">
+                                      <td className="py-2 px-2 text-gray-700">{item.mes}</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m²</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
                       </Card>
