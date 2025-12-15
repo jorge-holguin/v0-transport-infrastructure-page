@@ -317,6 +317,15 @@ export default function Home() {
 
   const maxChoferesTema = Math.max(...capacitacionTemasData.map((i) => i.choferes))
 
+  const sectionTitleByCategory: Record<string, string> = {
+    recaudacion: "Recaudación",
+    capacitacion: "Capacitación",
+    senalizaciones: "Señalización",
+    "parque-automotor": "Parque Automotor Antigüedad"
+  }
+
+  const sectionTitle = selectedCategory ? sectionTitleByCategory[selectedCategory] : ""
+
   return (
     <main className="min-h-screen relative">
       {/* Background Image */}
@@ -334,6 +343,11 @@ export default function Home() {
               Municipalidad Provincial de Piura
             </p>
             <h1 className="mt-3 text-4xl md:text-5xl font-bold drop-shadow-[0_4px_14px_rgba(0,0,0,0.7)]">Visor de Indicadores de Transporte</h1>
+            {sectionTitle && (
+              <p className="mt-3 text-2xl md:text-3xl font-bold text-blue-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+                {sectionTitle}
+              </p>
+            )}
           </div>
           <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-6xl mx-auto"}>
             {!selectedCategory ? (
@@ -608,11 +622,11 @@ export default function Home() {
                     {/* Tarjetas de Nivel 1 - Subgerencias */}
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
                       <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
-                        <h4 className="text-lg font-semibold text-red-600">
+                        <h4 className="text-lg font-semibold">
                           Recaudación Total por las SubGerencias de la Gerencia de Transporte y Movilidad Urbana
                         </h4>
 
-                        <div className="bg-gradient-to-r from-emerald-600 to-green-600 p-3 rounded-lg text-white shadow-md">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-lg text-white shadow-md">
                           <RecaudacionFilters
                             selectedYear={selectedYear}
                             onYearChange={setSelectedYear}
@@ -854,10 +868,10 @@ export default function Home() {
                     {capStep === "detalle" && (
                       <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
                         {/* Banner total choferes - mismo formato que otros encabezados */}
-                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4 rounded-lg text-white shadow-lg mb-2">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-2">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-green-100 text-xs font-medium mb-1">Total personas capacitadas</p>
+                              <p className="text-blue-100 text-xs font-medium mb-1">Total personas capacitadas</p>
                               <p className="text-2xl font-bold">
                                 {totalCapacitaciones.toLocaleString('es-PE')} personas capacitadas
                               </p>
@@ -973,7 +987,7 @@ export default function Home() {
                             {capacitacionPorModo.map((item) => (
                               <div key={item.modo} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
                                 <p className="text-sm font-semibold text-gray-900">
-                                  {item.cantidad.toLocaleString('es-PE')} personas capacitadas
+                                  {item.cantidad.toLocaleString('es-PE')} choferes capacitados
                                 </p>
                                 <p className="text-xs text-gray-700 mt-1">en {item.modo.toLowerCase()}</p>
                               </div>
@@ -985,7 +999,7 @@ export default function Home() {
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-green-600" />
-                            Total de Personas capacitadas por mes
+                            Total de Choferes capacitados por mes
                           </h4>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -3,9 +3,41 @@
 import { Card } from "@/components/ui/card"
 import { useState } from "react"
 import { DollarSign, Hash, TrendingUp } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { SubgerenciaDetailModal } from "./subgerencia-detail-modal"
 import { TipoDetailModal } from "./tipo-detail-modal"
+
+function DonutTooltip({
+  active,
+  payload,
+  formatter
+}: Readonly<{
+  active?: boolean
+  payload?: Array<{ name?: string; value?: number | string }>
+  formatter: (value: number) => string
+}>) {
+  if (!active || !payload?.length) return null
+
+  const entry = payload[0]
+  const name = String(entry?.name ?? "")
+  const rawValue = typeof entry?.value === "number" ? entry.value : Number(entry?.value ?? 0)
+
+  let title = name
+  if (name === "Recaudado") title = "Monto recaudado"
+  if (name === "Por recaudar") title = "Monto por recaudar"
+
+  const dotClass = name === "Recaudado" ? "bg-green-500" : "bg-orange-500"
+
+  return (
+    <div className="rounded-lg border border-white/40 bg-white/90 backdrop-blur-sm px-3 py-2 shadow-lg transition-all duration-200">
+      <div className="flex items-center gap-2">
+        <span className={`inline-block h-2.5 w-2.5 rounded-full ${dotClass}`} />
+        <span className="text-[11px] font-semibold text-gray-700">{title}</span>
+      </div>
+      <div className="mt-1 text-sm font-bold text-gray-900">{formatter(rawValue)}</div>
+    </div>
+  )
+}
 
 interface SubtipoDetalle {
   subtipo: string
@@ -69,6 +101,13 @@ export function SubgerenciaCard({
 
   const recaudadoValue = hasMetaData ? avanceValue ?? 0 : 0
   const porRecaudarValue = hasMetaData ? Math.max((metaValue ?? 0) - recaudadoValue, 0) : 0
+
+  const formatValue = (value: number) => {
+    if (metrica === "soles") {
+      return `S/ ${value.toLocaleString("es-PE", { minimumFractionDigits: 2 })}`
+    }
+    return `${value.toLocaleString("es-PE")} ${cantidadLabel}`
+  }
 
   const pieData = hasMetaData
     ? [
@@ -139,6 +178,10 @@ export function SubgerenciaCard({
               <div className="w-24 h-24">
                 <ResponsiveContainer>
                   <PieChart>
+                    <Tooltip
+                      cursor={false}
+                      content={<DonutTooltip formatter={formatValue} />}
+                    />
                     <Pie
                       data={pieData}
                       dataKey="value"
@@ -148,7 +191,7 @@ export function SubgerenciaCard({
                       stroke="transparent"
                     >
                       <Cell key="recaudado" fill="#16a34a" />
-                      <Cell key="por-recaudar" fill="#ef4444" />
+                      <Cell key="por-recaudar" fill="#f97316" />
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
@@ -161,7 +204,7 @@ export function SubgerenciaCard({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
+                  <span className="inline-block w-3 h-3 rounded-full bg-orange-500" />
                   <span>
                     Monto Pendiente de Recaudación: {porRecaudarPercent}%
                   </span>
