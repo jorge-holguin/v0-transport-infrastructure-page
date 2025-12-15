@@ -999,7 +999,7 @@ export default function Home() {
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-green-600" />
-                            Total de Choferes capacitados por mes
+                            Total de choferes capacitados por mes
                           </h4>
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1025,7 +1025,7 @@ export default function Home() {
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Vehículo Menores</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Taxis</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Transporte Urbano</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de Personas capacitadas por mes</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de choferes capacitadas por mes</th>
                                   </tr>
                                 </thead>
                                 <tbody>
