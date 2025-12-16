@@ -688,8 +688,8 @@ export default function Home() {
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
-                            totalSoles={285000}
-                            totalCantidad={1450}
+                            totalSoles={265300}
+                            totalCantidad={1422}
                             metaSoles={400000}
                             metaCantidad={2000}
                             showDonut={false}
@@ -798,8 +798,8 @@ export default function Home() {
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
-                            totalSoles={447304.84}
-                            totalCantidad={4680}
+                            totalSoles={210000}
+                            totalCantidad={3150}
                             metaSoles={550000}
                             metaCantidad={5200}
                             showDonut={false}
@@ -821,12 +821,13 @@ export default function Home() {
                               },
                               { 
                                 tipo: "Licencia Conducir Clase B-IIB", 
-                                soles: 140000, 
-                                cantidad: 2250,
+                                soles: 155000, 
+                                cantidad: 2550,
                                 subtipos: [
                                   { subtipo: "Emisión", soles: 80000, cantidad: 1200 },
                                   { subtipo: "Revalidación", soles: 45000, cantidad: 750 },
-                                  { subtipo: "Duplicado", soles: 15000, cantidad: 300 }
+                                  { subtipo: "Duplicado", soles: 15000, cantidad: 300 },
+                                  { subtipo: "Reprogramaciones", soles: 15000, cantidad: 300 }
                                 ]
                               },
                               { 

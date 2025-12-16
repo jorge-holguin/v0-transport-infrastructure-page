@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Card } from "@/components/ui/card"
-import { TrendingUp, DollarSign, Hash, ArrowLeft } from "lucide-react"
+import { TrendingUp, ArrowLeft } from "lucide-react"
 
 interface SubtipoDetalle {
   subtipo: string
@@ -129,7 +129,6 @@ export function TipoDetailModal({
   subgerencia,
   tipo,
   year,
-  metrica,
   estado,
   subtipos,
   totalSoles,
@@ -137,12 +136,42 @@ export function TipoDetailModal({
 }: TipoDetailModalProps) {
   // Check if soles data is available
   const hasSolesData = totalSoles !== undefined && totalSoles > 0
-  const [currentMetrica, setCurrentMetrica] = useState<"soles" | "cantidad">(
-    hasSolesData ? metrica : "cantidad"
-  )
+  const currentMetrica: "soles" | "cantidad" = hasSolesData ? "soles" : "cantidad"
   const [filterYear, setFilterYear] = useState(year)
   const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
   const [isPeriodoOpen, setIsPeriodoOpen] = useState(false)
+
+  const monthlyBaseData = [
+    { mes: "Enero", monto: 59647.86, cantidad: 1000 },
+    { mes: "Febrero", monto: 35047.60, cantidad: 850 },
+    { mes: "Marzo", monto: 28620.30, cantidad: 780 },
+    { mes: "Abril", monto: 20058.10, cantidad: 620 },
+    { mes: "Mayo", monto: 43409.98, cantidad: 910 },
+    { mes: "Junio", monto: 22716.30, cantidad: 700 },
+    { mes: "Julio", monto: 18701.70, cantidad: 640 },
+    { mes: "Agosto", monto: 23996.00, cantidad: 730 },
+    { mes: "Septiembre", monto: 107.00, cantidad: 10 },
+  ]
+
+  const subtipoSolesTotal = subtipos.reduce((acc, s) => acc + (s.soles ?? 0), 0)
+  const subtipoCantidadTotal = subtipos.reduce((acc, s) => acc + (s.cantidad ?? 0), 0)
+
+  const monthlyRecaudacionRows = monthlyBaseData.map((row) => {
+    const perSubtipo = subtipos.map((s) => {
+      const weight = subtipoSolesTotal ? (s.soles ?? 0) / subtipoSolesTotal : 0
+      return row.monto * weight
+    })
+    return { ...row, perSubtipo }
+  })
+
+  const monthlyCantidadRows = monthlyBaseData.map((row) => {
+    const perSubtipo = subtipos.map((s) => {
+      const weight = subtipoCantidadTotal ? (s.cantidad ?? 0) / subtipoCantidadTotal : 0
+      return Math.round(row.cantidad * weight)
+    })
+    const total = perSubtipo.reduce((a, b) => a + b, 0)
+    return { ...row, perSubtipo, total }
+  })
 
   const baseYear = parseInt(year, 10)
   const yearOptions = isNaN(baseYear)
@@ -204,52 +233,39 @@ export function TipoDetailModal({
               </DialogTitle>
             </div>
           </div>
-          {hasSolesData && (
-            <div className="mt-3 flex justify-end">
-              <div className="inline-flex rounded-lg border border-purple-100 bg-purple-50 p-1">
-                <button
-                  onClick={() => setCurrentMetrica("soles")}
-                  className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${
-                    currentMetrica === "soles"
-                      ? "bg-purple-600 text-white shadow-sm"
-                      : "text-purple-700 hover:text-purple-900"
-                  }`}
-                >
-                  <DollarSign className="w-3 h-3 inline mr-1" />
-                  Soles (S/)
-                </button>
-                <button
-                  onClick={() => setCurrentMetrica("cantidad")}
-                  className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${
-                    currentMetrica === "cantidad"
-                      ? "bg-purple-600 text-white shadow-sm"
-                      : "text-purple-700 hover:text-purple-900"
-                  }`}
-                >
-                  <Hash className="w-3 h-3 inline mr-1" />
-                  Cantidad
-                </button>
-              </div>
-            </div>
-          )}
         </DialogHeader>
 
         {/* Contenido principal en layout horizontal */}
         <div className="overflow-y-auto px-3 md:px-4 lg:px-6 pb-3 md:pb-4 lg:pb-6">
           {/* Total destacado - compacto */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-xs font-medium mb-1">
-                  {!hasSolesData ? "Total Cantidad" : currentMetrica === "soles" ? "Total Recaudación" : "Total Cantidad"}
-                </p>
-                <p className="text-2xl font-bold">
-                  {!hasSolesData || currentMetrica === "cantidad"
-                    ? `${(totalCantidad || 0).toLocaleString('es-PE')} unidades`
-                    : `S/ ${(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
-                  }
-                </p>
+            <div className="flex items-center justify-between gap-6 flex-wrap">
+              <div className="flex items-center gap-10 flex-wrap">
+                {hasSolesData ? (
+                  <>
+                    <div>
+                      <p className="text-purple-100 text-xs font-medium mb-1">Total Recaudación</p>
+                      <p className="text-2xl font-bold whitespace-nowrap">
+                        S/ {(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-purple-100 text-xs font-medium mb-1">Total de Trámites</p>
+                      <p className="text-2xl font-bold whitespace-nowrap">
+                        {(totalCantidad || 0).toLocaleString('es-PE')}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <p className="text-purple-100 text-xs font-medium mb-1">Total de Trámites</p>
+                    <p className="text-2xl font-bold whitespace-nowrap">
+                      {(totalCantidad || 0).toLocaleString('es-PE')}
+                    </p>
+                  </div>
+                )}
               </div>
+
               <div className="flex flex-wrap items-center justify-end gap-3 text-xs">
                 <div className="flex items-center gap-1">
                   <span className="font-semibold">Año:</span>
@@ -384,7 +400,7 @@ export function TipoDetailModal({
                                     S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                   </span>
                                   {subtipo.cantidad !== undefined && (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-lg font-bold text-purple-600 whitespace-nowrap">
                                       {subtipo.cantidad.toLocaleString('es-PE')} unidades
                                     </span>
                                   )}
@@ -407,6 +423,85 @@ export function TipoDetailModal({
                 <span>Distribución por Subtipo</span>
               </h4>
               <SubtipoPieChart subtipos={subtipos} metrica={currentMetrica} />
+            </div>
+
+            {/* Tablas por mes */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+                <h4 className="text-xs md:text-sm font-semibold text-red-600 mb-3">
+                  Total de recaudación por mes
+                </h4>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                      {subtipos.map((s) => (
+                        <th
+                          key={s.subtipo}
+                          className="text-center py-2 px-2 font-semibold text-red-600"
+                          title={s.subtipo}
+                        >
+                          {s.subtipo}
+                        </th>
+                      ))}
+                      <th className="text-right py-2 px-2 font-semibold text-gray-700">Recaudado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyRecaudacionRows.map((row) => (
+                      <tr key={row.mes} className="border-b hover:bg-gray-50">
+                        <td className="py-2 px-2 text-gray-700">{row.mes}</td>
+                        {row.perSubtipo.map((value, idx) => (
+                          <td key={idx} className="py-2 px-2 text-center text-gray-700 whitespace-nowrap">
+                            S/. {value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          </td>
+                        ))}
+                        <td className="py-2 px-2 text-right font-medium text-gray-900 whitespace-nowrap">
+                          S/. {row.monto.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+                <h4 className="text-xs md:text-sm font-semibold text-red-600 mb-3">
+                  Total de Trámites por mes
+                </h4>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                      {subtipos.map((s) => (
+                        <th
+                          key={s.subtipo}
+                          className="text-center py-2 px-2 font-semibold text-red-600"
+                          title={s.subtipo}
+                        >
+                          {s.subtipo}
+                        </th>
+                      ))}
+                      <th className="text-right py-2 px-2 font-semibold text-gray-700">Cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyCantidadRows.map((row) => (
+                      <tr key={row.mes} className="border-b hover:bg-gray-50">
+                        <td className="py-2 px-2 text-gray-700">{row.mes}</td>
+                        {row.perSubtipo.map((value, idx) => (
+                          <td key={idx} className="py-2 px-2 text-center text-gray-700 whitespace-nowrap">
+                            {value.toLocaleString('es-PE')}
+                          </td>
+                        ))}
+                        <td className="py-2 px-2 text-right font-medium text-gray-900 whitespace-nowrap">
+                          {row.total.toLocaleString('es-PE')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
