@@ -141,6 +141,25 @@ export function TipoDetailModal({
   const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
   const [isPeriodoOpen, setIsPeriodoOpen] = useState(false)
 
+  const normalize = (value: string) => value.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
+
+  const shouldAddReprogramacion = normalize(tipo).includes("licencia conducir clase b-iic")
+
+  const baseSolesTotal = subtipos.reduce((acc, s) => acc + (s.soles ?? 0), 0)
+  const baseCantidadTotal = subtipos.reduce((acc, s) => acc + (s.cantidad ?? 0), 0)
+
+  const displayedSubtipos: SubtipoDetalle[] = (() => {
+    if (!shouldAddReprogramacion) return subtipos
+
+    const hasRepro = subtipos.some((s) => normalize(s.subtipo).includes("reprogram"))
+    if (hasRepro) return subtipos
+
+    const missingSoles = Math.max(0, (totalSoles ?? 0) - baseSolesTotal)
+    const missingCantidad = Math.max(0, (totalCantidad ?? 0) - baseCantidadTotal)
+
+    return [...subtipos, { subtipo: "Reprogramación", soles: missingSoles, cantidad: missingCantidad }]
+  })()
+
   const monthlyBaseData = [
     { mes: "Enero", monto: 59647.86, cantidad: 1000 },
     { mes: "Febrero", monto: 35047.60, cantidad: 850 },
@@ -153,11 +172,11 @@ export function TipoDetailModal({
     { mes: "Septiembre", monto: 107.00, cantidad: 10 },
   ]
 
-  const subtipoSolesTotal = subtipos.reduce((acc, s) => acc + (s.soles ?? 0), 0)
-  const subtipoCantidadTotal = subtipos.reduce((acc, s) => acc + (s.cantidad ?? 0), 0)
+  const subtipoSolesTotal = displayedSubtipos.reduce((acc, s) => acc + (s.soles ?? 0), 0)
+  const subtipoCantidadTotal = displayedSubtipos.reduce((acc, s) => acc + (s.cantidad ?? 0), 0)
 
   const monthlyRecaudacionRows = monthlyBaseData.map((row) => {
-    const perSubtipo = subtipos.map((s) => {
+    const perSubtipo = displayedSubtipos.map((s) => {
       const weight = subtipoSolesTotal ? (s.soles ?? 0) / subtipoSolesTotal : 0
       return row.monto * weight
     })
@@ -165,7 +184,7 @@ export function TipoDetailModal({
   })
 
   const monthlyCantidadRows = monthlyBaseData.map((row) => {
-    const perSubtipo = subtipos.map((s) => {
+    const perSubtipo = displayedSubtipos.map((s) => {
       const weight = subtipoCantidadTotal ? (s.cantidad ?? 0) / subtipoCantidadTotal : 0
       return Math.round(row.cantidad * weight)
     })
@@ -357,7 +376,7 @@ export function TipoDetailModal({
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                {subtipos.map((subtipo, index) => {
+                {displayedSubtipos.map((subtipo, index) => {
                   const color = CHART_COLORS[index % CHART_COLORS.length]
                   return (
                     <Card
@@ -422,7 +441,7 @@ export function TipoDetailModal({
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-purple-600" />
                 <span>Distribución por Subtipo</span>
               </h4>
-              <SubtipoPieChart subtipos={subtipos} metrica={currentMetrica} />
+              <SubtipoPieChart subtipos={displayedSubtipos} metrica={currentMetrica} />
             </div>
 
             {/* Tablas por mes */}
@@ -435,7 +454,7 @@ export function TipoDetailModal({
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                      {subtipos.map((s) => (
+                      {displayedSubtipos.map((s) => (
                         <th
                           key={s.subtipo}
                           className="text-center py-2 px-2 font-semibold text-red-600"
@@ -473,7 +492,7 @@ export function TipoDetailModal({
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                      {subtipos.map((s) => (
+                      {displayedSubtipos.map((s) => (
                         <th
                           key={s.subtipo}
                           className="text-center py-2 px-2 font-semibold text-red-600"

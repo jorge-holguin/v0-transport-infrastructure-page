@@ -410,51 +410,65 @@ export function SubgerenciaDetailModal({
               </h4>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                  {displayedDetalles.map((detalle, index) => {
-                    const color = CHART_COLORS[index % CHART_COLORS.length]
-                    return (
-                      <Card 
-                        key={index} 
-                        className="p-3 border hover:shadow-lg transition-all bg-white cursor-pointer"
-                        style={{ borderColor: color, backgroundColor: `${color}10` }}
-                        onClick={() => handleTipoClick(detalle)}
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span 
-                              className="w-2 h-2 rounded-full flex-shrink-0" 
-                              style={{ backgroundColor: color }} 
-                            />
-                            <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">{detalle.tipo}</h5>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            {hasSolesData && detalle.soles !== undefined ? (
-                              <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
-                                <span className="text-lg font-bold text-blue-600 whitespace-nowrap">
-                                  S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                                </span>
-                                {detalle.cantidad !== undefined && (
-                                  <span className="text-xs text-gray-500">
-                                    {detalle.cantidad.toLocaleString('es-PE')} unidades
-                                  </span>
-                                )}
+                  {(() => {
+                    // Calculate total for percentages
+                    const total = displayedDetalles.reduce((sum, d) => {
+                      const value = hasSolesData ? (d.soles || 0) : (d.cantidad || 0)
+                      return sum + value
+                    }, 0)
+                    
+                    return displayedDetalles.map((detalle, index) => {
+                      const color = CHART_COLORS[index % CHART_COLORS.length]
+                      const value = hasSolesData ? (detalle.soles || 0) : (detalle.cantidad || 0)
+                      const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
+                      
+                      return (
+                        <Card 
+                          key={index} 
+                          className="p-3 border hover:shadow-lg transition-all bg-white cursor-pointer"
+                          style={{ borderColor: color, backgroundColor: `${color}10` }}
+                          onClick={() => handleTipoClick(detalle)}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span 
+                                  className="w-2 h-2 rounded-full flex-shrink-0" 
+                                  style={{ backgroundColor: color }} 
+                                />
+                                <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">{detalle.tipo}</h5>
                               </div>
-                            ) : (
-                              detalle.cantidad !== undefined && (
+                              <span className="text-xs font-bold text-gray-600 flex-shrink-0">{percentage}%</span>
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                              {hasSolesData && detalle.soles !== undefined ? (
                                 <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-lg font-bold text-blue-600">
-                                      {detalle.cantidad.toLocaleString('es-PE')}
+                                  <span className="text-lg font-bold text-blue-600 whitespace-nowrap">
+                                    S/ {detalle.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                  </span>
+                                  {detalle.cantidad !== undefined && (
+                                    <span className="text-xs text-gray-500">
+                                      {detalle.cantidad.toLocaleString('es-PE')} unidades
                                     </span>
-                                    <span className="text-xs text-gray-500">unidades</span>
-                                  </div>
+                                  )}
                                 </div>
-                              )
-                            )}
-                          </div>
-                      </div>
-                    </Card>
-                  )})}
+                              ) : (
+                                detalle.cantidad !== undefined && (
+                                  <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
+                                    <div className="flex items-baseline gap-1">
+                                      <span className="text-lg font-bold text-blue-600">
+                                        {detalle.cantidad.toLocaleString('es-PE')}
+                                      </span>
+                                      <span className="text-xs text-gray-500">unidades</span>
+                                    </div>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                        </div>
+                      </Card>
+                    )})
+                  })()}
                 </div>
             </div>
 
@@ -550,6 +564,88 @@ export function SubgerenciaDetailModal({
                               <td className="py-2 px-2 text-center text-gray-700">{biib.toLocaleString('es-PE')}</td>
                               <td className="py-2 px-2 text-center text-gray-700">{biic.toLocaleString('es-PE')}</td>
                               <td className="py-2 px-2 text-right font-medium text-gray-900">{total.toLocaleString('es-PE')}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sección Reprogramaciones - solo para Tránsito y Movilidad Urbana */}
+            {subgerencia === "Subgerencia de Tránsito y Movilidad Urbana" && (
+              <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+                <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <BarChart3 className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
+                  <span>Reprogramaciones</span>
+                </h4>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="overflow-x-auto">
+                    <h5 className="text-xs font-semibold text-red-600 mb-2">Total de reprogramaciones por mes</h5>
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
+                          <th className="text-center py-2 px-2 font-semibold text-red-600">Licencia B-IIB</th>
+                          <th className="text-center py-2 px-2 font-semibold text-red-600">Licencia B-IIC</th>
+                          <th className="text-right py-2 px-2 font-semibold text-gray-700">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { mes: "Enero", cantidad: 45 },
+                          { mes: "Febrero", cantidad: 32 },
+                          { mes: "Marzo", cantidad: 28 },
+                          { mes: "Abril", cantidad: 18 },
+                          { mes: "Mayo", cantidad: 38 },
+                          { mes: "Junio", cantidad: 22 },
+                          { mes: "Julio", cantidad: 15 },
+                          { mes: "Agosto", cantidad: 25 },
+                          { mes: "Septiembre", cantidad: 5 }
+                        ].map((item, idx) => {
+                          const biib = Math.round(item.cantidad * 0.6)
+                          const biic = item.cantidad - biib
+                          return (
+                            <tr key={idx} className="border-b hover:bg-gray-50">
+                              <td className="py-2 px-2 text-gray-700">{item.mes}</td>
+                              <td className="py-2 px-2 text-center text-gray-700">{biib.toLocaleString('es-PE')}</td>
+                              <td className="py-2 px-2 text-center text-gray-700">{biic.toLocaleString('es-PE')}</td>
+                              <td className="py-2 px-2 text-right font-medium text-gray-900">{item.cantidad.toLocaleString('es-PE')}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <h5 className="text-xs font-semibold text-red-600 mb-2">Motivos de reprogramación</h5>
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-2 font-semibold text-gray-700">Motivo</th>
+                          <th className="text-center py-2 px-2 font-semibold text-red-600">Cantidad</th>
+                          <th className="text-right py-2 px-2 font-semibold text-gray-700">Porcentaje</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { motivo: "Documentación incompleta", cantidad: 85 },
+                          { motivo: "Examen médico vencido", cantidad: 62 },
+                          { motivo: "Falta de pago", cantidad: 45 },
+                          { motivo: "Error en datos personales", cantidad: 28 },
+                          { motivo: "Otros", cantidad: 8 }
+                        ].map((item, idx) => {
+                          const totalMotivos = 228
+                          const porcentaje = ((item.cantidad / totalMotivos) * 100).toFixed(1)
+                          return (
+                            <tr key={idx} className="border-b hover:bg-gray-50">
+                              <td className="py-2 px-2 text-gray-700">{item.motivo}</td>
+                              <td className="py-2 px-2 text-center text-gray-700">{item.cantidad.toLocaleString('es-PE')}</td>
+                              <td className="py-2 px-2 text-right font-medium text-gray-900">{porcentaje}%</td>
                             </tr>
                           )
                         })}
