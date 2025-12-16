@@ -216,7 +216,11 @@ export function SubgerenciaDetailModal({
       buckets.set(key, [...(buckets.get(key) ?? []), d])
     }
 
-    const toSubtipos = (members: DetalleNivel2[]): SubtipoDetalle[] => {
+    const toSubtipos = (members: DetalleNivel2[], groupKey: string): SubtipoDetalle[] => {
+      // Para Taxis, los subtipos son Taxis Dispersos y Taxis Remix (las tarjetas individuales)
+      if (groupKey === "Taxis") {
+        return members.map((m) => ({ subtipo: m.tipo, soles: m.soles, cantidad: m.cantidad }))
+      }
       const withSubtipos = members.filter((m) => (m.subtipos?.length ?? 0) > 0)
       if (withSubtipos.length > 0) {
         return withSubtipos.flatMap((m) => m.subtipos ?? [])
@@ -235,7 +239,7 @@ export function SubgerenciaDetailModal({
         tipo: key,
         soles: sum(members, "soles"),
         cantidad: sum(members, "cantidad"),
-        subtipos: toSubtipos(members)
+        subtipos: toSubtipos(members, key)
       })
     }
 
@@ -682,6 +686,7 @@ export function SubgerenciaDetailModal({
         subtipos={selectedTipo.subtipos || []}
         totalSoles={selectedTipo.soles}
         totalCantidad={selectedTipo.cantidad}
+        taxisOriginalData={selectedTipo.tipo === "Taxis" ? detalles.filter(d => d.tipo.toLowerCase().includes("taxi")) : undefined}
       />
     )}
     </>

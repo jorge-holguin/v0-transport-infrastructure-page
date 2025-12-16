@@ -772,7 +772,7 @@ export default function Home() {
                                 cantidad: 22,
                                 subtipos: [
                                   { subtipo: "Autorización", soles: 2000, cantidad: 12 },
-                                  { subtipo: "Renovación TUC", soles: 1500, cantidad: 10 }
+                                  { subtipo: "Renovación", soles: 1500, cantidad: 10 }
                                 ]
                               },
                               { 
@@ -781,9 +781,9 @@ export default function Home() {
                                 cantidad: 35,
                                 subtipos: [
                                   { subtipo: "Autorización", soles: 1800, cantidad: 11 },
-                                  { subtipo: "Habilitaciones", soles: 1200, cantidad: 9 },
-                                  { subtipo: "Renovación TUC", soles: 1000, cantidad: 8 },
-                                  { subtipo: "Sustitución Vehicular", soles: 800, cantidad: 7 }
+                                  { subtipo: "Renovación", soles: 1000, cantidad: 8 },
+                                  { subtipo: "Sustitución", soles: 800, cantidad: 7 },
+                                  { subtipo: "Habilitación", soles: 1200, cantidad: 9 }
                                 ]
                               }
                             ]}

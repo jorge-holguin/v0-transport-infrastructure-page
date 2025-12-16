@@ -14,6 +14,13 @@ interface SubtipoDetalle {
   proyectado?: number
 }
 
+interface TaxiOriginalData {
+  tipo: string
+  soles?: number
+  cantidad?: number
+  subtipos?: SubtipoDetalle[]
+}
+
 interface TipoDetailModalProps {
   isOpen: boolean
   onClose: () => void
@@ -25,6 +32,7 @@ interface TipoDetailModalProps {
   subtipos: SubtipoDetalle[]
   totalSoles?: number
   totalCantidad?: number
+  taxisOriginalData?: TaxiOriginalData[]
 }
 
 // Colores para el gráfico de torta
@@ -135,7 +143,8 @@ export function TipoDetailModal({
   estado,
   subtipos,
   totalSoles,
-  totalCantidad
+  totalCantidad,
+  taxisOriginalData
 }: TipoDetailModalProps) {
   // Check if soles data is available
   const hasSolesData = totalSoles !== undefined && totalSoles > 0
@@ -144,6 +153,10 @@ export function TipoDetailModal({
   const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
   const [isPeriodoOpen, setIsPeriodoOpen] = useState(false)
   const [selectedSubtipo, setSelectedSubtipo] = useState<string | null>(null)
+  
+  // Estado para manejar la vista de Taxis (Taxis Dispersos / Taxis Remix)
+  const [selectedTaxiTipo, setSelectedTaxiTipo] = useState<TaxiOriginalData | null>(null)
+  const isTaxisView = tipo === "Taxis"
 
   const normalize = (value: string) => value.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
 
@@ -245,6 +258,7 @@ export function TipoDetailModal({
         .join(", ") || "Seleccionar"
   
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
         className="!max-w-[100vw] !w-[100vw] md:!max-w-[95vw] md:!w-[95vw] xl:!max-w-[85vw] xl:!w-[85vw] 2xl:!max-w-[75vw] 2xl:!w-[75vw] !max-h-[90vh] p-0 flex flex-col"
@@ -447,12 +461,15 @@ export function TipoDetailModal({
                 {displayedSubtipos.map((subtipo, index) => {
                   const color = CHART_COLORS[index % CHART_COLORS.length]
                   const isFiscalizacion = subgerencia.toLowerCase().includes("fiscaliz")
+                  const isTaxiCard = isTaxisView && taxisOriginalData
+                  const taxiData = isTaxiCard ? taxisOriginalData.find(t => t.tipo === subtipo.subtipo) : null
+                  
                   return (
                     <Card
                       key={index}
-                      className={`p-3 border hover:shadow-md transition-all bg-white ${isFiscalizacion ? 'cursor-pointer' : ''}`}
+                      className={`p-3 border hover:shadow-md transition-all bg-white ${isFiscalizacion || isTaxiCard ? 'cursor-pointer' : ''}`}
                       style={{ borderColor: color, backgroundColor: `${color}08` }}
-                      onClick={isFiscalizacion ? () => setSelectedSubtipo(subtipo.subtipo) : undefined}
+                      onClick={isTaxiCard && taxiData ? () => setSelectedTaxiTipo(taxiData) : (isFiscalizacion ? () => setSelectedSubtipo(subtipo.subtipo) : undefined)}
                     >
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -586,5 +603,22 @@ export function TipoDetailModal({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Modal recursivo para Taxis Dispersos / Taxis Remix */}
+    {selectedTaxiTipo && (
+      <TipoDetailModal
+        isOpen={!!selectedTaxiTipo}
+        onClose={() => setSelectedTaxiTipo(null)}
+        subgerencia={subgerencia}
+        tipo={selectedTaxiTipo.tipo}
+        year={year}
+        metrica={currentMetrica}
+        estado={estado}
+        subtipos={selectedTaxiTipo.subtipos || []}
+        totalSoles={selectedTaxiTipo.soles}
+        totalCantidad={selectedTaxiTipo.cantidad}
+      />
+    )}
+    </>
   )
 }
