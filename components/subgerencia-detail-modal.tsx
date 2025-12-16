@@ -221,6 +221,10 @@ export function SubgerenciaDetailModal({
       if (groupKey === "Taxis") {
         return members.map((m) => ({ subtipo: m.tipo, soles: m.soles, cantidad: m.cantidad }))
       }
+      // Para Transporte Especial, los subtipos son las 4 categorías principales (Trabajadores, Turismo, Estudiantes, Carga/Descarga)
+      if (groupKey === "Transporte Especial") {
+        return members.map((m) => ({ subtipo: m.tipo, soles: m.soles, cantidad: m.cantidad }))
+      }
       const withSubtipos = members.filter((m) => (m.subtipos?.length ?? 0) > 0)
       if (withSubtipos.length > 0) {
         return withSubtipos.flatMap((m) => m.subtipos ?? [])
