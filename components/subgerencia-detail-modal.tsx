@@ -10,6 +10,9 @@ interface SubtipoDetalle {
   subtipo: string
   soles?: number
   cantidad?: number
+  recaudado?: number
+  pendiente?: number
+  proyectado?: number
 }
 
 interface DetalleNivel2 {
@@ -125,6 +128,7 @@ interface SubgerenciaDetailModalProps {
   onClose: () => void
   subgerencia: string
   year: string
+  metrica?: "soles" | "cantidad"
   estado: string
   detalles: DetalleNivel2[]
   totalSoles?: number
@@ -136,6 +140,7 @@ export function SubgerenciaDetailModal({
   onClose,
   subgerencia,
   year,
+  metrica,
   estado,
   detalles,
   totalSoles,
@@ -147,6 +152,10 @@ export function SubgerenciaDetailModal({
   // Check if soles data is available
   const hasSolesData = totalSoles !== undefined && totalSoles > 0
   const currentMetrica: "soles" | "cantidad" = hasSolesData ? "soles" : "cantidad"
+
+  const cantidadTitle = subgerencia.toLowerCase().includes("fiscaliz")
+    ? "Total de Actas de Control"
+    : "Total de Trámites"
 
   const [filterYear, setFilterYear] = useState(year)
   const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
@@ -299,7 +308,7 @@ export function SubgerenciaDetailModal({
                       </p>
                     </div>
                     <div>
-                      <p className="text-blue-100 text-[10px] md:text-xs font-medium mb-1">Total de Actas de Control</p>
+                      <p className="text-blue-100 text-[10px] md:text-xs font-medium mb-1">{cantidadTitle}</p>
                       <p className="text-xl md:text-2xl font-bold whitespace-nowrap">
                         {displayedTotalCantidad.toLocaleString('es-PE')}
                       </p>
@@ -307,7 +316,7 @@ export function SubgerenciaDetailModal({
                   </>
                 ) : (
                   <div>
-                    <p className="text-blue-100 text-[10px] md:text-xs font-medium mb-1">Total de Actas de Control</p>
+                    <p className="text-blue-100 text-[10px] md:text-xs font-medium mb-1">{cantidadTitle}</p>
                     <p className="text-xl md:text-2xl font-bold whitespace-nowrap">
                       {displayedTotalCantidad.toLocaleString('es-PE')}
                     </p>
@@ -481,7 +490,7 @@ export function SubgerenciaDetailModal({
               <PieChart
                 detalles={displayedDetalles}
                 metrica={currentMetrica}
-                showLegend={subgerencia !== "Subgerencia de Tránsito y Movilidad Urbana"}
+                showLegend={true}
               />
             </div>
 
@@ -575,7 +584,7 @@ export function SubgerenciaDetailModal({
             )}
 
             {/* Sección Reprogramaciones - solo para Tránsito y Movilidad Urbana */}
-            {subgerencia === "Subgerencia de Tránsito y Movilidad Urbana" && (
+            {subgerencia === "Subgerencia de Tránsito y Movilidad Urbana" && false && (
               <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm">
                 <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <BarChart3 className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { Calendar, Filter, DollarSign } from "lucide-react"
@@ -7,8 +8,8 @@ import { Calendar, Filter, DollarSign } from "lucide-react"
 interface RecaudacionFiltersProps {
   selectedYear: string
   onYearChange: (year: string) => void
-  selectedMonth: string
-  onMonthChange: (month: string) => void
+  selectedMonths: string[]
+  onMonthsChange: (months: string[]) => void
   selectedEstado: string
   onEstadoChange: (estado: string) => void
   selectedMetrica: "soles" | "cantidad"
@@ -19,11 +20,122 @@ interface RecaudacionFiltersProps {
   variant?: "card" | "inline"
 }
 
+const monthOptions = [
+  { value: "Todos", label: "Todos" },
+  { value: "enero", label: "Ene" },
+  { value: "febrero", label: "Feb" },
+  { value: "marzo", label: "Mar" },
+  { value: "abril", label: "Abr" },
+  { value: "mayo", label: "May" },
+  { value: "junio", label: "Jun" },
+  { value: "julio", label: "Jul" },
+  { value: "agosto", label: "Ago" },
+  { value: "septiembre", label: "Sep" },
+  { value: "octubre", label: "Oct" },
+  { value: "noviembre", label: "Nov" },
+  { value: "diciembre", label: "Dic" }
+]
+
+function MonthMultiSelect({
+  selectedMonths,
+  onMonthsChange,
+  variant
+}: {
+  selectedMonths: string[]
+  onMonthsChange: (months: string[]) => void
+  variant: "card" | "inline"
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const selectedSummary = selectedMonths.includes("Todos")
+    ? "Todos"
+    : monthOptions
+        .filter((p) => selectedMonths.includes(p.value))
+        .map((p) => p.label)
+        .join(", ") || "Seleccionar"
+
+  const handleCheckboxChange = (value: string, checked: boolean) => {
+    const monthValues = monthOptions
+      .filter((opt) => opt.value !== "Todos")
+      .map((opt) => opt.value)
+
+    if (checked) {
+      if (value === "Todos") {
+        onMonthsChange(["Todos", ...monthValues])
+      } else {
+        onMonthsChange([...selectedMonths.filter((v) => v !== "Todos"), value])
+      }
+    } else {
+      if (value === "Todos") {
+        onMonthsChange([])
+      } else {
+        const next = selectedMonths.filter((v) => v !== value)
+        const remainingMonths = next.filter((v) => v !== "Todos")
+        onMonthsChange(remainingMonths.length === 0 ? [] : next)
+      }
+    }
+  }
+
+  return (
+    <div className={variant === "card" ? "" : "flex items-start gap-1 relative"}>
+      {variant === "card" ? (
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-blue-600" />
+          Meses/Periodo
+        </label>
+      ) : (
+        <span className="font-semibold text-white mt-0.5">Meses/Periodo:</span>
+      )}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className={variant === "card" 
+            ? "flex items-center gap-1 w-full bg-white border border-blue-300 hover:border-blue-500 text-gray-900 text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 justify-between"
+            : "flex items-center gap-1 border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70 min-w-[140px] justify-between"
+          }
+        >
+          <span className="truncate text-left">
+            {selectedSummary}
+          </span>
+          <span className="text-[9px]">▼</span>
+        </button>
+        {isOpen && (
+          <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
+            <div className="p-2 text-[11px] font-semibold text-gray-700 border-b border-gray-100">
+              Selecciona meses / periodos
+            </div>
+            <div className="p-2 flex flex-col gap-1 text-xs">
+              {monthOptions.map((p) => {
+                const checked = selectedMonths.includes(p.value)
+                return (
+                  <label
+                    key={p.value}
+                    className="flex items-center gap-2 px-1 py-0.5 rounded hover:bg-gray-100 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-3 w-3 accent-blue-600"
+                      checked={checked}
+                      onChange={(e) => handleCheckboxChange(p.value, e.target.checked)}
+                    />
+                    <span className="text-[11px]">{p.label}</span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function RecaudacionFilters({
   selectedYear,
   onYearChange,
-  selectedMonth,
-  onMonthChange,
+  selectedMonths,
+  onMonthsChange,
   selectedEstado,
   onEstadoChange,
   selectedMetrica,
@@ -65,36 +177,11 @@ export function RecaudacionFilters({
           </Select>
         </div>
 
-        <div className={variant === "card" ? "" : "flex items-center gap-1"}>
-          {variant === "card" ? (
-            <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-blue-600" />
-              Mes
-            </label>
-          ) : (
-            <span className="font-semibold text-white">Mes:</span>
-          )}
-          <Select value={selectedMonth} onValueChange={onMonthChange}>
-            <SelectTrigger className={variant === "card" ? "bg-white border-blue-300 hover:border-blue-500 transition-colors" : "h-7 w-[110px] border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"}>
-              <SelectValue placeholder="Seleccionar mes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Todos">Todos</SelectItem>
-              <SelectItem value="enero">Enero</SelectItem>
-              <SelectItem value="febrero">Febrero</SelectItem>
-              <SelectItem value="marzo">Marzo</SelectItem>
-              <SelectItem value="abril">Abril</SelectItem>
-              <SelectItem value="mayo">Mayo</SelectItem>
-              <SelectItem value="junio">Junio</SelectItem>
-              <SelectItem value="julio">Julio</SelectItem>
-              <SelectItem value="agosto">Agosto</SelectItem>
-              <SelectItem value="septiembre">Septiembre</SelectItem>
-              <SelectItem value="octubre">Octubre</SelectItem>
-              <SelectItem value="noviembre">Noviembre</SelectItem>
-              <SelectItem value="diciembre">Diciembre</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <MonthMultiSelect
+          selectedMonths={selectedMonths}
+          onMonthsChange={onMonthsChange}
+          variant={variant}
+        />
 
         {variant === "card" && (
           <div>

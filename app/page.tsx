@@ -18,7 +18,7 @@ export default function Home() {
   
   // Estados para filtros de recaudación
   const [selectedYear, setSelectedYear] = useState("2024")
-  const [selectedMonth, setSelectedMonth] = useState("Todos")
+  const [selectedMonths, setSelectedMonths] = useState<string[]>(["Todos"])
   const [selectedEstado, setSelectedEstado] = useState("Todos")
   const [selectedMetrica, setSelectedMetrica] = useState<"soles" | "cantidad">("soles")
   const [selectedSubgerencias, setSelectedSubgerencias] = useState<string[]>([
@@ -447,36 +447,36 @@ export default function Home() {
                         Recaudación Total por la Gerencia de Transporte y Movilidad Urbana
                       </h4>
                       
-                      {/* Total destacado */}
-                      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-lg text-white shadow-lg mb-6">
+                      {/* Total destacado - una sola fila con gradiente */}
+                      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg shadow-lg mb-6">
                         <div className="flex items-center justify-between flex-wrap gap-4">
-                          <div className="flex gap-6">
-                            <div className="rounded-lg bg-green-500/20 border border-green-300/30 px-4 py-3">
-                              <p className="text-blue-100 text-xs font-medium mb-1">Monto Recaudado</p>
-                              <p className="text-2xl font-bold">
+                          <div className="flex items-center gap-4">
+                            <div className="bg-green-500 rounded-lg px-4 py-2">
+                              <p className="text-white text-xs font-medium mb-0.5">Monto Recaudado</p>
+                              <p className="text-xl font-bold text-white whitespace-nowrap">
                                 S/ {totalAvance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div className="rounded-lg bg-red-500/20 border border-red-300/30 px-4 py-3">
-                              <p className="text-blue-100 text-xs font-medium mb-1">Monto Pendiente de Recaudación</p>
-                              <p className="text-2xl font-bold">
+                            <div className="bg-red-500 rounded-lg px-4 py-2">
+                              <p className="text-white text-xs font-medium mb-0.5">Monto Pendiente de Recaudación</p>
+                              <p className="text-xl font-bold text-white whitespace-nowrap">
                                 S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div className="rounded-lg bg-sky-500/20 border border-sky-300/30 px-4 py-3">
-                              <p className="text-blue-100 text-xs font-medium mb-1">Recaudación Total Proyectada</p>
-                              <p className="text-2xl font-bold">
+                            <div className="bg-blue-500 rounded-lg px-4 py-2">
+                              <p className="text-white text-xs font-medium mb-0.5">Recaudación Total Proyectada</p>
+                              <p className="text-xl font-bold text-white whitespace-nowrap">
                                 S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
-                            <div className="rounded-lg bg-white/10 border border-white/20 px-4 py-3">
-                              <p className="text-blue-100 text-xs font-medium mb-1">Cumplimiento</p>
-                              <p className="text-2xl font-bold">
+                            <div className="bg-emerald-500 rounded-lg px-4 py-2">
+                              <p className="text-white text-xs font-medium mb-0.5">Cumplimiento</p>
+                              <p className="text-xl font-bold text-white whitespace-nowrap">
                                 {(totalMeta > 0 ? ((totalAvance / totalMeta) * 100) : 0).toFixed(1)}%
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-4 text-white text-xs">
                             <RecaudacionFilters
                               selectedYear={selectedYear}
                               onYearChange={setSelectedYear}
@@ -491,8 +491,8 @@ export default function Home() {
                                 "Subgerencia de Fiscalización",
                                 "Subgerencia de Tránsito y Movilidad Urbana"
                               ]}
-                              selectedMonth={selectedMonth}
-                              onMonthChange={setSelectedMonth}
+                              selectedMonths={selectedMonths}
+                              onMonthsChange={setSelectedMonths}
                               variant="inline"
                             />
                           </div>
@@ -623,7 +623,7 @@ export default function Home() {
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
                       <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
                         <h4 className="text-lg font-semibold">
-                          Recaudación Total por las SubGerencias de la Gerencia de Transporte y Movilidad Urbana
+                          Recaudación
                         </h4>
 
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-lg text-white shadow-md">
@@ -641,8 +641,8 @@ export default function Home() {
                               "Subgerencia de Fiscalización",
                               "Subgerencia de Tránsito y Movilidad Urbana"
                             ]}
-                            selectedMonth={selectedMonth}
-                            onMonthChange={setSelectedMonth}
+                            selectedMonths={selectedMonths}
+                            onMonthsChange={setSelectedMonths}
                             variant="inline"
                           />
                         </div>
@@ -652,7 +652,7 @@ export default function Home() {
                         {selectedSubgerencias.includes("Subgerencia de Fiscalización") && (
                           <SubgerenciaCard
                             nombre="Subgerencia de Fiscalización"
-                            titulo="Monto recaudado por Subgerencia de Fiscalización"
+                            titulo="Monto Proyectado para recaudadación por Subgerencia de Fiscalización"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
@@ -668,12 +668,12 @@ export default function Home() {
                                 soles: 145000, 
                                 cantidad: 850,
                                 subtipos: [
-                                  { subtipo: "PJ01 - Pago con descuento", soles: 55000, cantidad: 330 },
-                                  { subtipo: "PJ02 - Pago ordinario", soles: 42000, cantidad: 250 },
-                                  { subtipo: "PJ03 - Pago fraccionado", soles: 33000, cantidad: 190 },
-                                  { subtipo: "C01 - Citación primera", soles: 5000, cantidad: 30 },
-                                  { subtipo: "C02 - Citación segunda", soles: 6000, cantidad: 35 },
-                                  { subtipo: "C03 - Citación final", soles: 4000, cantidad: 15 }
+                                  { subtipo: "C-1: Prestar servicios en un vehículo no habilitado", soles: 55000, cantidad: 330, recaudado: 55000, pendiente: 15000, proyectado: 70000 },
+                                  { subtipo: "C-3: Por estacionarse en zonas prohibidas", soles: 42000, cantidad: 250, recaudado: 42000, pendiente: 8000, proyectado: 50000 },
+                                  { subtipo: "C-09: Por usar equipos de sonido superando los decibles permitidos", soles: 33000, cantidad: 190, recaudado: 33000, pendiente: 7000, proyectado: 40000 },
+                                  { subtipo: "T-05: Circular con unidades vehiculares sin los elementos", soles: 5000, cantidad: 30, recaudado: 5000, pendiente: 5000, proyectado: 10000 },
+                                  { subtipo: "T-21: Por utilizar la vía pública como paradero", soles: 6000, cantidad: 35, recaudado: 6000, pendiente: 4000, proyectado: 10000 },
+                                  { subtipo: "F-01: Prestar servicio de transporte de persona sin contar", soles: 4000, cantidad: 15, recaudado: 4000, pendiente: 6000, proyectado: 10000 }
                                 ]
                               }
                             ]}

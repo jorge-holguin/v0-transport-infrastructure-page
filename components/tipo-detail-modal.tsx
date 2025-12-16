@@ -9,6 +9,9 @@ interface SubtipoDetalle {
   subtipo: string
   soles?: number
   cantidad?: number
+  recaudado?: number
+  pendiente?: number
+  proyectado?: number
 }
 
 interface TipoDetailModalProps {
@@ -140,6 +143,7 @@ export function TipoDetailModal({
   const [filterYear, setFilterYear] = useState(year)
   const [filterPeriodos, setFilterPeriodos] = useState<string[]>(["Todos"])
   const [isPeriodoOpen, setIsPeriodoOpen] = useState(false)
+  const [selectedSubtipo, setSelectedSubtipo] = useState<string | null>(null)
 
   const normalize = (value: string) => value.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
 
@@ -190,6 +194,26 @@ export function TipoDetailModal({
     })
     const total = perSubtipo.reduce((a, b) => a + b, 0)
     return { ...row, perSubtipo, total }
+  })
+
+  // Datos de tabla mensual para el subtipo seleccionado
+  const monthlyTableData = monthlyBaseData.map((row) => {
+    const selectedSub = displayedSubtipos.find(s => s.subtipo === selectedSubtipo)
+    const weight = selectedSub && subtipoSolesTotal ? (selectedSub.soles ?? 0) / subtipoSolesTotal : 1 / displayedSubtipos.length
+    const cantidadWeight = selectedSub && subtipoCantidadTotal ? (selectedSub.cantidad ?? 0) / subtipoCantidadTotal : 1 / displayedSubtipos.length
+    const recaudado = row.monto * weight
+    const proyectado = recaudado * 1.3
+    const pendiente = proyectado - recaudado
+    const archivado = recaudado * 0.05
+    const cantidad = Math.round(row.cantidad * cantidadWeight)
+    return {
+      mes: row.mes,
+      cantidad,
+      proyectado,
+      pendiente,
+      archivado,
+      recaudado
+    }
   })
 
   const baseYear = parseInt(year, 10)
@@ -260,29 +284,73 @@ export function TipoDetailModal({
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-4">
             <div className="flex items-center justify-between gap-6 flex-wrap">
               <div className="flex items-center gap-10 flex-wrap">
-                {hasSolesData ? (
-                  <>
-                    <div>
-                      <p className="text-purple-100 text-xs font-medium mb-1">Total Recaudación</p>
-                      <p className="text-2xl font-bold whitespace-nowrap">
-                        S/ {(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-purple-100 text-xs font-medium mb-1">Total de Trámites</p>
-                      <p className="text-2xl font-bold whitespace-nowrap">
-                        {(totalCantidad || 0).toLocaleString('es-PE')}
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <div>
-                    <p className="text-purple-100 text-xs font-medium mb-1">Total de Trámites</p>
-                    <p className="text-2xl font-bold whitespace-nowrap">
-                      {(totalCantidad || 0).toLocaleString('es-PE')}
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  const isFiscalizacion = subgerencia.toLowerCase().includes("fiscaliz")
+                  const cantidadLabel = isFiscalizacion ? "Total de Actas de Control" : "Total de Trámites"
+                  
+                  if (hasSolesData && isFiscalizacion) {
+                    return (
+                      <>
+                        <div className="rounded-lg bg-green-500/20 border border-green-300/30 px-3 py-2">
+                          <p className="text-green-100 text-xs font-medium mb-1">Monto Recaudado</p>
+                          <p className="text-xl font-bold whitespace-nowrap">
+                            S/ {(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-red-500/20 border border-red-300/30 px-3 py-2">
+                          <p className="text-red-100 text-xs font-medium mb-1">Monto Pendiente de Recaudación</p>
+                          <p className="text-xl font-bold whitespace-nowrap">
+                            S/ {Math.max((displayedSubtipos.reduce((acc, s) => acc + (s.pendiente ?? 0), 0)), 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-sky-500/20 border border-sky-300/30 px-3 py-2">
+                          <p className="text-sky-100 text-xs font-medium mb-1">Recaudación Total Proyectada</p>
+                          <p className="text-xl font-bold whitespace-nowrap">
+                            S/ {(displayedSubtipos.reduce((acc, s) => acc + (s.proyectado ?? s.soles ?? 0), 0)).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-white/10 border border-white/20 px-3 py-2">
+                          <p className="text-blue-100 text-xs font-medium mb-1">Cumplimiento</p>
+                          <p className="text-xl font-bold whitespace-nowrap">
+                            {((totalSoles || 0) / (displayedSubtipos.reduce((acc, s) => acc + (s.proyectado ?? s.soles ?? 0), 0) || 1) * 100).toFixed(1)}%
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-purple-500/20 border border-purple-300/30 px-3 py-2">
+                          <p className="text-purple-100 text-xs font-medium mb-1">{cantidadLabel}</p>
+                          <p className="text-xl font-bold whitespace-nowrap">
+                            {(totalCantidad || 0).toLocaleString('es-PE')}
+                          </p>
+                        </div>
+                      </>
+                    )
+                  } else if (hasSolesData) {
+                    return (
+                      <>
+                        <div>
+                          <p className="text-blue-100 text-xs font-medium mb-1">Total Recaudación</p>
+                          <p className="text-2xl font-bold whitespace-nowrap">
+                            S/ {(totalSoles || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-blue-100 text-xs font-medium mb-1">{cantidadLabel}</p>
+                          <p className="text-2xl font-bold whitespace-nowrap">
+                            {(totalCantidad || 0).toLocaleString('es-PE')}
+                          </p>
+                        </div>
+                      </>
+                    )
+                  } else {
+                    return (
+                      <div>
+                        <p className="text-blue-100 text-xs font-medium mb-1">{cantidadLabel}</p>
+                        <p className="text-2xl font-bold whitespace-nowrap">
+                          {(totalCantidad || 0).toLocaleString('es-PE')}
+                        </p>
+                      </div>
+                    )
+                  }
+                })()}
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3 text-xs">
@@ -378,61 +446,131 @@ export function TipoDetailModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                 {displayedSubtipos.map((subtipo, index) => {
                   const color = CHART_COLORS[index % CHART_COLORS.length]
+                  const isFiscalizacion = subgerencia.toLowerCase().includes("fiscaliz")
                   return (
                     <Card
                       key={index}
-                      className="p-3 border hover:shadow-md transition-all bg-white"
-                      style={{ borderColor: color, backgroundColor: `${color}15` }}
+                      className={`p-3 border hover:shadow-md transition-all bg-white ${isFiscalizacion ? 'cursor-pointer' : ''}`}
+                      style={{ borderColor: color, backgroundColor: `${color}08` }}
+                      onClick={isFiscalizacion ? () => setSelectedSubtipo(subtipo.subtipo) : undefined}
                     >
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <span
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ backgroundColor: color }}
                           />
-                          <h5 className="font-semibold text-gray-900 text-xs leading-tight truncate">
+                          <h5 className="font-semibold text-gray-900 text-xs leading-tight">
                             {subtipo.subtipo}
                           </h5>
                         </div>
-                        <div className="flex flex-col gap-0.5">
-                          {currentMetrica === "cantidad" ? (
-                            // Cantidad como métrica principal: cantidad + unidades a la izquierda, soles a la derecha, centrado en el card
-                            <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-lg font-bold text-purple-600">
-                                  {(subtipo.cantidad || 0).toLocaleString('es-PE')}
-                                </span>
-                                <span className="text-xs text-gray-500">unidades</span>
-                              </div>
-                              {subtipo.soles !== undefined && (
-                                <span className="text-xs text-gray-500 whitespace-nowrap">
+                        {isFiscalizacion ? (
+                          <>
+                            <div className="grid grid-cols-2 gap-1">
+                              <button 
+                                className="bg-blue-500 text-white text-[10px] font-medium px-2 py-1 rounded hover:bg-blue-600 transition-colors"
+                                onClick={(e) => { e.stopPropagation(); setSelectedSubtipo(subtipo.subtipo); }}
+                              >
+                                Recaudado
+                              </button>
+                              <button 
+                                className="bg-orange-400 text-white text-[10px] font-medium px-2 py-1 rounded hover:bg-orange-500 transition-colors"
+                                onClick={(e) => { e.stopPropagation(); setSelectedSubtipo(subtipo.subtipo); }}
+                              >
+                                Pendiente
+                              </button>
+                              <button 
+                                className="bg-purple-600 text-white text-[10px] font-medium px-2 py-1 rounded hover:bg-purple-700 transition-colors"
+                                onClick={(e) => { e.stopPropagation(); setSelectedSubtipo(subtipo.subtipo); }}
+                              >
+                                Proyectado
+                              </button>
+                              <button 
+                                className="bg-blue-700 text-white text-[10px] font-medium px-2 py-1 rounded hover:bg-blue-800 transition-colors"
+                                onClick={(e) => { e.stopPropagation(); setSelectedSubtipo(subtipo.subtipo); }}
+                              >
+                                Cantidad
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-1 text-center">
+                              <span className="text-xs font-bold text-blue-600">
+                                S/ {(subtipo.recaudado ?? subtipo.soles ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </span>
+                              <span className="text-xs font-bold text-orange-500">
+                                S/ {(subtipo.pendiente ?? 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </span>
+                              <span className="text-xs font-bold text-purple-600">
+                                S/ {(subtipo.proyectado ?? (subtipo.soles ?? 0)).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </span>
+                              <span className="text-xs font-bold text-blue-700">
+                                {(subtipo.cantidad ?? 0).toLocaleString('es-PE')} unidades
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col gap-0.5">
+                            {subtipo.soles !== undefined && (
+                              <div className="flex items-baseline justify-between gap-3">
+                                <span className="text-lg font-bold text-purple-600 whitespace-nowrap">
                                   S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                                 </span>
-                              )}
-                            </div>
-                          ) : (
-                            // Soles como métrica principal: soles a la izquierda, cantidad a la derecha, misma separación
-                            <>
-                              {subtipo.soles !== undefined && (
-                                <div className="flex items-baseline justify-between gap-3 max-w-[220px] w-full mx-auto">
-                                  <span className="text-lg font-bold text-purple-600 whitespace-nowrap">
-                                    S/ {subtipo.soles.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                {subtipo.cantidad !== undefined && (
+                                  <span className="text-sm text-gray-500 whitespace-nowrap">
+                                    {subtipo.cantidad.toLocaleString('es-PE')} unidades
                                   </span>
-                                  {subtipo.cantidad !== undefined && (
-                                    <span className="text-lg font-bold text-purple-600 whitespace-nowrap">
-                                      {subtipo.cantidad.toLocaleString('es-PE')} unidades
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </Card>
                   )
                 })}
               </div>
+
+              {/* Tabla detallada del subtipo seleccionado - SOLO para Fiscalización */}
+              {selectedSubtipo && subgerencia.toLowerCase().includes("fiscaliz") && (
+                <div className="mt-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-red-600">
+                      Total de recaudación por mes - {selectedSubtipo}
+                    </h4>
+                    <button
+                      onClick={() => setSelectedSubtipo(null)}
+                      className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"
+                    >
+                      ✕ Cerrar
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b bg-gray-50">
+                          <th className="text-left py-2 px-3 font-semibold text-gray-700">Mes</th>
+                          <th className="text-center py-2 px-3 font-semibold text-blue-600 bg-blue-50">Cantidad</th>
+                          <th className="text-center py-2 px-3 font-semibold text-purple-600 bg-purple-50">Proyectado</th>
+                          <th className="text-center py-2 px-3 font-semibold text-orange-500 bg-orange-50">Pendiente</th>
+                          <th className="text-center py-2 px-3 font-semibold text-gray-600 bg-gray-100">Archivado</th>
+                          <th className="text-center py-2 px-3 font-semibold text-green-600 bg-green-50">Recaudado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {monthlyTableData.map((row) => (
+                          <tr key={row.mes} className="border-b hover:bg-gray-50">
+                            <td className="py-2 px-3 text-gray-700 font-medium">{row.mes}</td>
+                            <td className="py-2 px-3 text-center text-blue-600">{row.cantidad.toLocaleString('es-PE')}</td>
+                            <td className="py-2 px-3 text-center text-purple-600">S/ {row.proyectado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</td>
+                            <td className="py-2 px-3 text-center text-orange-500">S/ {row.pendiente.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</td>
+                            <td className="py-2 px-3 text-center text-gray-600">S/ {row.archivado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</td>
+                            <td className="py-2 px-3 text-center text-green-600">S/ {row.recaudado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Gráfico de Torta */}
@@ -444,84 +582,6 @@ export function TipoDetailModal({
               <SubtipoPieChart subtipos={displayedSubtipos} metrica={currentMetrica} />
             </div>
 
-            {/* Tablas por mes */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-                <h4 className="text-xs md:text-sm font-semibold text-red-600 mb-3">
-                  Total de recaudación por mes
-                </h4>
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                      {displayedSubtipos.map((s) => (
-                        <th
-                          key={s.subtipo}
-                          className="text-center py-2 px-2 font-semibold text-red-600"
-                          title={s.subtipo}
-                        >
-                          {s.subtipo}
-                        </th>
-                      ))}
-                      <th className="text-right py-2 px-2 font-semibold text-gray-700">Recaudado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyRecaudacionRows.map((row) => (
-                      <tr key={row.mes} className="border-b hover:bg-gray-50">
-                        <td className="py-2 px-2 text-gray-700">{row.mes}</td>
-                        {row.perSubtipo.map((value, idx) => (
-                          <td key={idx} className="py-2 px-2 text-center text-gray-700 whitespace-nowrap">
-                            S/. {value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                          </td>
-                        ))}
-                        <td className="py-2 px-2 text-right font-medium text-gray-900 whitespace-nowrap">
-                          S/. {row.monto.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-                <h4 className="text-xs md:text-sm font-semibold text-red-600 mb-3">
-                  Total de Trámites por mes
-                </h4>
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                      {displayedSubtipos.map((s) => (
-                        <th
-                          key={s.subtipo}
-                          className="text-center py-2 px-2 font-semibold text-red-600"
-                          title={s.subtipo}
-                        >
-                          {s.subtipo}
-                        </th>
-                      ))}
-                      <th className="text-right py-2 px-2 font-semibold text-gray-700">Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyCantidadRows.map((row) => (
-                      <tr key={row.mes} className="border-b hover:bg-gray-50">
-                        <td className="py-2 px-2 text-gray-700">{row.mes}</td>
-                        {row.perSubtipo.map((value, idx) => (
-                          <td key={idx} className="py-2 px-2 text-center text-gray-700 whitespace-nowrap">
-                            {value.toLocaleString('es-PE')}
-                          </td>
-                        ))}
-                        <td className="py-2 px-2 text-right font-medium text-gray-900 whitespace-nowrap">
-                          {row.total.toLocaleString('es-PE')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
         </div>
       </DialogContent>

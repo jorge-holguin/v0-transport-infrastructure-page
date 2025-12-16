@@ -43,6 +43,9 @@ interface SubtipoDetalle {
   subtipo: string
   soles?: number
   cantidad?: number
+  recaudado?: number
+  pendiente?: number
+  proyectado?: number
 }
 
 interface DetalleNivel2 {
