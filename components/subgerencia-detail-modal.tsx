@@ -199,7 +199,7 @@ export function SubgerenciaDetailModal({
 
     const toGroup = (tipoValue: string): string | null => {
       const t = normalize(tipoValue)
-      if (t.includes("transporte especial")) return "Transporte Especial"
+      if (t.includes("transporte especial") || t.includes("carga/descarga") || t.includes("carga descarga")) return "Transporte Especial"
       if (t.includes("transporte urbano")) return "Transporte Urbano"
       if (t.includes("vehiculos menores") || t.includes("vehiculos menor") || t.includes("mototaxi") || t.includes("mototaxis")) {
         return "Vehículos Menores"
