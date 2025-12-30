@@ -8,7 +8,7 @@ import { RecaudacionCard } from "@/components/recaudacion-card"
 import { PermisoCard } from "@/components/permiso-card"
 import { SubgerenciaCard } from "@/components/subgerencia-card"
 import { RecaudacionFilters } from "@/components/recaudacion-filters"
-import { Building, Users, ShieldCheck, GraduationCap, Car, ArrowLeft } from "lucide-react"
+import { Building, Users, ShieldCheck, GraduationCap, Car } from "lucide-react"
 import { CustomNavbar } from "@/components/custom-navbar"
 import { TipoDetailModal } from "@/components/tipo-detail-modal"
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
@@ -16,19 +16,18 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   
-  // Estados para filtros de recaudaci√≥n
+  // Estados para filtros de recaudaci+¶n
   const [selectedYear, setSelectedYear] = useState("2024")
   const [selectedMonths, setSelectedMonths] = useState<string[]>(["Todos"])
   const [selectedEstado, setSelectedEstado] = useState("Todos")
   const [selectedMetrica, setSelectedMetrica] = useState<"soles" | "cantidad">("soles")
   const [selectedSubgerencias, setSelectedSubgerencias] = useState<string[]>([
     "Subgerencia de Transportes",
-    "Subgerencia de Fiscalizaci√≥n",
-    "Subgerencia de Tr√°nsito y Movilidad Urbana"
+    "Subgerencia de Fiscalizaci+¶n",
+    "Subgerencia de Tr+Ìnsito y Movilidad Urbana"
   ])
   const [senalStep, setSenalStep] = useState<"subgerencia" | "horizontal" | "detalle">("subgerencia")
   const [capStep, setCapStep] = useState<"subgerencia" | "detalle">("subgerencia")
-  const [recaudacionStep, setRecaudacionStep] = useState<"menu" | "gerencia" | "fiscalizacion" | "transportes" | "transito" | "educacion">("menu")
 
   const [capFilterYear, setCapFilterYear] = useState(selectedYear)
   const [capFilterPeriodos, setCapFilterPeriodos] = useState<string[]>(["Todos"])
@@ -94,7 +93,7 @@ export default function Home() {
         .map((p) => p.label)
         .join(", ") || "Seleccionar"
 
-  // Datos para el gr√°fico comparativo con avance y meta (solo recaudaci√≥n)
+  // Datos para el gr+Ìfico comparativo con avance y meta (solo recaudaci+¶n)
   const subgerenciasData = [
     { 
       nombre: "Subgerencia de Transportes", 
@@ -105,7 +104,7 @@ export default function Home() {
       color: "#3b82f6" 
     },
     { 
-      nombre: "Subgerencia de Fiscalizaci√≥n", 
+      nombre: "Subgerencia de Fiscalizaci+¶n", 
       soles: 145000, // mismo totalSoles que la tarjeta
       cantidad: 850, 
       metaSoles: 180000, // misma metaSoles que la tarjeta
@@ -113,8 +112,8 @@ export default function Home() {
       color: "#f97316" 
     },
     { 
-      nombre: "Subgerencia de Tr√°nsito y Movilidad Urbana", 
-      soles: 447304.84, // mismo totalSoles que la tarjeta de Tr√°nsito
+      nombre: "Subgerencia de Tr+Ìnsito y Movilidad Urbana", 
+      soles: 447304.84, // mismo totalSoles que la tarjeta de Tr+Ìnsito
       cantidad: 4680, 
       metaSoles: 550000, // ajustar meta para que el cumplimiento sea < 100%
       metaCantidad: 5200, 
@@ -137,7 +136,7 @@ export default function Home() {
   ]
 
   // Datos mensuales: se escalan para que la suma coincida con el total recaudado
-  // Distribuci√≥n base proporcional para 11 meses (hasta noviembre)
+  // Distribuci+¶n base proporcional para 11 meses (hasta noviembre)
   const monthlyBaseData = [
     { mes: "Enero", proporcion: 0.095 },
     { mes: "Febrero", proporcion: 0.098 },
@@ -188,7 +187,7 @@ export default function Home() {
     })
   })()
 
-  // Datos de ejemplo para Se√±alizaci√≥n Horizontal (solo m¬≤)
+  // Datos de ejemplo para Se+¶alizaci+¶n Horizontal (solo m-¶)
   const senalizacionMensualData = [
     { mes: "Enero", m2: 4200 },
     { mes: "Febrero", m2: 4300 },
@@ -216,10 +215,10 @@ export default function Home() {
   const totalM2Senalizacion = filteredSenalizacionMensualData.reduce((acc, item) => acc + item.m2, 0)
 
   const senalTiposConfig = [
-    { tipo: "Zonas R√≠gidas", weight: 0.22 },
-    { tipo: "L√≠nea Separadora", weight: 0.21 },
+    { tipo: "Zonas R+°gidas", weight: 0.22 },
+    { tipo: "L+°nea Separadora", weight: 0.21 },
     { tipo: "Paso Zebra (Peatonal)", weight: 0.2 },
-    { tipo: "L√≠nea de Parada", weight: 0.19 },
+    { tipo: "L+°nea de Parada", weight: 0.19 },
     { tipo: "Flecha Direccional", weight: 0.18 }
   ]
 
@@ -244,7 +243,7 @@ export default function Home() {
 
   const maxM2Tipo = Math.max(...senalizacionTiposData.map((i) => i.m2))
 
-  // Datos de ejemplo para Capacitaci√≥n
+  // Datos de ejemplo para Capacitaci+¶n
   const capacitacionMensualBaseData = [
     { mes: "Enero", vm: 1560, taxis: 624, tu: 416 },
     { mes: "Febrero", vm: 1620, taxis: 648, tu: 432 },
@@ -278,7 +277,7 @@ export default function Home() {
 
   const capacitacionPorModo = [
     {
-      modo: "Veh√≠culos menores",
+      modo: "Veh+°culos menores",
       cantidad: filteredCapacitacionMensualData.reduce((acc, item) => acc + item.vm, 0)
     },
     {
@@ -319,9 +318,10 @@ export default function Home() {
   const maxChoferesTema = Math.max(...capacitacionTemasData.map((i) => i.choferes))
 
   const sectionTitleByCategory: Record<string, string> = {
-    recaudacion: "Recaudaci√≥n",
-    capacitacion: "Capacitaci√≥n",
-    senalizaciones: "Se√±alizaci√≥n"
+    recaudacion: "Recaudaci+¶n",
+    capacitacion: "Capacitaci+¶n",
+    senalizaciones: "Se+¶alizaci+¶n",
+    "parque-automotor": "Parque Automotor Antig++edad"
   }
 
   const sectionTitle = selectedCategory ? sectionTitleByCategory[selectedCategory] : ""
@@ -342,7 +342,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.3em] text-blue-200 drop-shadow-[0_2px_6px_rgba(0,0,0,0.65)]">
               Municipalidad Provincial de Piura
             </p>
-            <h1 className="mt-3 text-4xl md:text-5xl font-bold drop-shadow-[0_4px_14px_rgba(0,0,0,0.7)]">Plataforma de datos</h1>
+            <h1 className="mt-3 text-4xl md:text-5xl font-bold drop-shadow-[0_4px_14px_rgba(0,0,0,0.7)]">Visor de Indicadores de Transporte</h1>
             {sectionTitle && (
               <p className="mt-3 text-2xl md:text-3xl font-bold text-blue-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
                 {sectionTitle}
@@ -351,17 +351,17 @@ export default function Home() {
           </div>
           <div className={selectedCategory ? "max-w-7xl mx-auto" : "max-w-6xl mx-auto"}>
             {!selectedCategory ? (
-              // Main Category Selection - 3 Categories
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+              // Main Category Selection - 4 Categories
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto items-stretch">
                 <Card
                   className="w-full bg-white/95 backdrop-blur-sm hover:bg-blue-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  onClick={() => { setSelectedCategory("recaudacion"); setRecaudacionStep("menu") }}
+                  onClick={() => setSelectedCategory("recaudacion")}
                 >
                   <div className="p-8 flex flex-col items-center text-center gap-4">
                     <CreditCard className="w-16 h-16 text-blue-600 group-hover:text-white transition-colors" />
                     <div>
                       <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Recaudaci√≥n
+                        Recaudaci+¶n
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
                         Montos totales recaudados por subgerencias
@@ -378,7 +378,7 @@ export default function Home() {
                     <GraduationCap className="w-16 h-16 text-green-600 group-hover:text-white transition-colors" />
                     <div>
                       <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Capacitaci√≥n
+                        Capacitaci+¶n
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
                         Capacitaciones viales realizadas
@@ -395,10 +395,27 @@ export default function Home() {
                     <Building className="w-16 h-16 text-orange-600 group-hover:text-white transition-colors" />
                     <div>
                       <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
-                        Se√±alizaci√≥n
+                        Se+¶alizaci+¶n
                       </h3>
                       <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
-                        Tipos de se√±alizaci√≥n
+                        Tipos de se+¶alizaci+¶n
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card
+                  className="w-full bg-white/95 backdrop-blur-sm hover:bg-purple-500 hover:scale-105 transition-all duration-300 cursor-pointer group"
+                  onClick={() => setSelectedCategory("parque-automotor")}
+                >
+                  <div className="p-8 flex flex-col items-center text-center gap-4">
+                    <Car className="w-16 h-16 text-purple-600 group-hover:text-white transition-colors" />
+                    <div>
+                      <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-white transition-colors">
+                        Parque Automotor Antig++edad
+                      </h3>
+                      <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors">
+                        An+Ìlisis de antig++edad vehicular
                       </p>
                     </div>
                   </div>
@@ -407,93 +424,27 @@ export default function Home() {
             ) : (
               // Indicator Details View
               <div className="space-y-4">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="mb-6 px-6 py-3 bg-white/95 hover:bg-white text-gray-900 font-semibold rounded-lg shadow-md transition-all"
+                >
+                  ‘Â… Volver a categor+°as
+                </button>
+
                 {selectedCategory === "recaudacion" && (
                   <div className="space-y-6">
-                    {/* Men√∫ intermedio de Recaudaci√≥n */}
-                    {recaudacionStep === "menu" && (
-                      <div className="space-y-6">
-                        {/* Fila 1: Gerencia (bot√≥n naranja centrado) */}
-                        <div className="flex justify-center">
-                          <Card
-                            className="bg-orange-500 hover:bg-orange-600 hover:scale-105 transition-all duration-300 cursor-pointer px-8 py-4"
-                            onClick={() => setRecaudacionStep("gerencia")}
-                          >
-                            <div className="text-center text-white">
-                              <h3 className="font-bold text-lg">Gerencia de Transporte y</h3>
-                              <h3 className="font-bold text-lg">Movilidad Urbana</h3>
-                            </div>
-                          </Card>
-                        </div>
-
-                        {/* Fila 2: 4 Subgerencias */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                          <Card
-                            className="bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-300 cursor-pointer"
-                            onClick={() => setRecaudacionStep("fiscalizacion")}
-                          >
-                            <div className="p-4 text-center text-white">
-                              <h3 className="font-bold text-sm">SubGerencia</h3>
-                              <h3 className="font-bold text-sm">Fiscalizaci√≥n</h3>
-                            </div>
-                          </Card>
-
-                          <Card
-                            className="bg-yellow-500 hover:bg-yellow-600 hover:scale-105 transition-all duration-300 cursor-pointer"
-                            onClick={() => setRecaudacionStep("transportes")}
-                          >
-                            <div className="p-4 text-center text-white">
-                              <h3 className="font-bold text-sm">SubGerencia</h3>
-                              <h3 className="font-bold text-sm">Transportes</h3>
-                            </div>
-                          </Card>
-
-                          <Card
-                            className="bg-green-600 hover:bg-green-700 hover:scale-105 transition-all duration-300 cursor-pointer"
-                            onClick={() => setRecaudacionStep("transito")}
-                          >
-                            <div className="p-4 text-center text-white">
-                              <h3 className="font-bold text-sm">SubGerencia</h3>
-                              <h3 className="font-bold text-sm">Tr√°nsito y Movilidad</h3>
-                              <h3 className="font-bold text-sm">Urbana</h3>
-                            </div>
-                          </Card>
-
-                          <Card
-                            className="bg-sky-500 hover:bg-sky-600 hover:scale-105 transition-all duration-300 cursor-pointer"
-                            onClick={() => setRecaudacionStep("educacion")}
-                          >
-                            <div className="p-4 text-center text-white">
-                              <h3 className="font-bold text-sm">SubGerencia</h3>
-                              <h3 className="font-bold text-sm">Educaci√≥n y</h3>
-                              <h3 className="font-bold text-sm">Seguridad Vial</h3>
-                            </div>
-                          </Card>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Vista de Gerencia de Transporte - Modal completo */}
-                    {recaudacionStep === "gerencia" && (
+                    {/* Gr+Ìfico Comparativo General */}
                     <Card className="bg-white/95 backdrop-blur-sm p-8">
-                      {/* Bot√≥n Volver */}
-                      <button
-                        onClick={() => setRecaudacionStep("menu")}
-                        className="mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                      >
-                        <ArrowLeft className="w-5 h-5" />
-                        Atr√°s
-                      </button>
-                      
                       <div className="mb-6">
                         <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-1">
                           <CreditCard className="w-8 h-8 text-blue-600" />
                           Indicadores de la Gerencia de Transportes
                         </h3>
-                        <p className="text-lg text-gray-600 ml-11">Recaudaci√≥n</p>
+                        <p className="text-lg text-gray-600 ml-11">Recaudaci+¶n</p>
                       </div>
 
                       <h4 className="text-lg font-semibold text-gray-900 mb-6">
-                        Recaudaci√≥n Total por la Gerencia de Transporte y Movilidad Urbana
+                        Recaudaci+¶n Total por la Gerencia de Transporte y Movilidad Urbana
                       </h4>
                       
                       {/* Total destacado - una sola fila con gradiente */}
@@ -507,13 +458,13 @@ export default function Home() {
                               </p>
                             </div>
                             <div className="bg-red-500 rounded-lg px-4 py-2">
-                              <p className="text-white text-xs font-medium mb-0.5">Monto Pendiente de Recaudaci√≥n</p>
+                              <p className="text-white text-xs font-medium mb-0.5">Monto Pendiente de Recaudaci+¶n</p>
                               <p className="text-xl font-bold text-white whitespace-nowrap">
                                 S/ {Math.max(totalMeta - totalAvance, 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
                             <div className="bg-blue-500 rounded-lg px-4 py-2">
-                              <p className="text-white text-xs font-medium mb-0.5">Recaudaci√≥n Total Proyectada</p>
+                              <p className="text-white text-xs font-medium mb-0.5">Recaudaci+¶n Total Proyectada</p>
                               <p className="text-xl font-bold text-white whitespace-nowrap">
                                 S/ {totalMeta.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                               </p>
@@ -537,8 +488,8 @@ export default function Home() {
                               onSubgerenciasChange={setSelectedSubgerencias}
                               availableSubgerencias={[
                                 "Subgerencia de Transportes",
-                                "Subgerencia de Fiscalizaci√≥n",
-                                "Subgerencia de Tr√°nsito y Movilidad Urbana"
+                                "Subgerencia de Fiscalizaci+¶n",
+                                "Subgerencia de Tr+Ìnsito y Movilidad Urbana"
                               ]}
                               selectedMonths={selectedMonths}
                               onMonthsChange={setSelectedMonths}
@@ -548,9 +499,9 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Layout: Gr√°fico de Torta + Gr√°fico de Barras */}
+                      {/* Layout: Gr+Ìfico de Torta + Gr+Ìfico de Barras */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        {/* Gr√°fico de Torta General */}
+                        {/* Gr+Ìfico de Torta General */}
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                           <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
                             <PieChartIcon className="w-4 h-4 text-blue-600" />
@@ -589,11 +540,11 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Gr√°fico de Barras por Mes (Stacked: Recaudado + Por Recaudar) */}
+                        {/* Gr+Ìfico de Barras por Mes (Stacked: Recaudado + Por Recaudar) */}
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                           <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-blue-600" />
-                            Recaudaci√≥n por Mes (Porcentajes)
+                            Recaudaci+¶n por Mes (Porcentajes)
                           </h5>
                           <div className="w-full h-64">
                             <ResponsiveContainer>
@@ -613,18 +564,18 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Tabla de Recaudaci√≥n por Mes */}
+                      {/* Tabla de Recaudaci+¶n por Mes */}
                       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-4">Recaudaci√≥n Mensual por la Gerencia de Transporte y Movilidad Urbana</h5>
+                        <h5 className="text-sm font-semibold text-gray-700 mb-4">Recaudaci+¶n Mensual por la Gerencia de Transporte y Movilidad Urbana</h5>
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-gray-200">
                                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Mes</th>
                                 <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Recaudado</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Pendiente de Recaudaci√≥n</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Acumulado Pendiente de Recaudaci√≥n</th>
-                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Recaudaci√≥n Total Proyectada</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Pendiente de Recaudaci+¶n</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Monto Acumulado Pendiente de Recaudaci+¶n</th>
+                                <th className="text-right py-3 px-4 font-semibold text-gray-700">Recaudaci+¶n Total Proyectada</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -667,31 +618,41 @@ export default function Home() {
                         </div>
                       </div>
                     </Card>
-                    )}
 
-                    {/* Vista de Subgerencia de Fiscalizaci√≥n */}
-                    {recaudacionStep === "fiscalizacion" && (
-                      <Card className="bg-white/95 backdrop-blur-sm p-8">
-                        {/* Bot√≥n Volver */}
-                        <button
-                          onClick={() => setRecaudacionStep("menu")}
-                          className="mb-4 flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
-                        <div className="mb-6">
-                          <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-1">
-                            <ShieldCheck className="w-8 h-8 text-red-600" />
-                            Subgerencia de Fiscalizaci√≥n
-                          </h3>
-                          <p className="text-lg text-gray-600 ml-11">Recaudaci√≥n por Fiscalizaci√≥n</p>
+                    {/* Tarjetas de Nivel 1 - Subgerencias */}
+                    <Card className="bg-white/95 backdrop-blur-sm p-8">
+                      <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
+                        <h4 className="text-lg font-semibold">
+                          Recaudaci+¶n
+                        </h4>
+
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-lg text-white shadow-md">
+                          <RecaudacionFilters
+                            selectedYear={selectedYear}
+                            onYearChange={setSelectedYear}
+                            selectedEstado={selectedEstado}
+                            onEstadoChange={setSelectedEstado}
+                            selectedMetrica={selectedMetrica}
+                            onMetricaChange={setSelectedMetrica}
+                            selectedSubgerencias={selectedSubgerencias}
+                            onSubgerenciasChange={setSelectedSubgerencias}
+                            availableSubgerencias={[
+                              "Subgerencia de Transportes",
+                              "Subgerencia de Fiscalizaci+¶n",
+                              "Subgerencia de Tr+Ìnsito y Movilidad Urbana"
+                            ]}
+                            selectedMonths={selectedMonths}
+                            onMonthsChange={setSelectedMonths}
+                            variant="inline"
+                          />
                         </div>
-                        <div className="grid grid-cols-1 gap-6">
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Subgerencia de Fiscalizaci+¶n */}
+                        {selectedSubgerencias.includes("Subgerencia de Fiscalizaci+¶n") && (
                           <SubgerenciaCard
-                            nombre="Subgerencia de Fiscalizaci√≥n"
-                            titulo="Monto Proyectado para recaudadaci√≥n por Subgerencia de Fiscalizaci√≥n"
+                            nombre="Subgerencia de Fiscalizaci+¶n"
+                            titulo="Monto Proyectado para recaudadaci+¶n por Subgerencia de Fiscalizaci+¶n"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
@@ -707,40 +668,20 @@ export default function Home() {
                                 soles: 145000, 
                                 cantidad: 850,
                                 subtipos: [
-                                  { subtipo: "C-1: Prestar servicios en un veh√≠culo no habilitado", soles: 55000, cantidad: 330, recaudado: 55000, pendiente: 15000, proyectado: 70000 },
+                                  { subtipo: "C-1: Prestar servicios en un veh+°culo no habilitado", soles: 55000, cantidad: 330, recaudado: 55000, pendiente: 15000, proyectado: 70000 },
                                   { subtipo: "C-3: Por estacionarse en zonas prohibidas", soles: 42000, cantidad: 250, recaudado: 42000, pendiente: 8000, proyectado: 50000 },
                                   { subtipo: "C-09: Por usar equipos de sonido superando los decibles permitidos", soles: 33000, cantidad: 190, recaudado: 33000, pendiente: 7000, proyectado: 40000 },
                                   { subtipo: "T-05: Circular con unidades vehiculares sin los elementos", soles: 5000, cantidad: 30, recaudado: 5000, pendiente: 5000, proyectado: 10000 },
-                                  { subtipo: "T-21: Por utilizar la v√≠a p√∫blica como paradero", soles: 6000, cantidad: 35, recaudado: 6000, pendiente: 4000, proyectado: 10000 },
+                                  { subtipo: "T-21: Por utilizar la v+°a p+¶blica como paradero", soles: 6000, cantidad: 35, recaudado: 6000, pendiente: 4000, proyectado: 10000 },
                                   { subtipo: "F-01: Prestar servicio de transporte de persona sin contar", soles: 4000, cantidad: 15, recaudado: 4000, pendiente: 6000, proyectado: 10000 }
                                 ]
                               }
                             ]}
                           />
-                        </div>
-                      </Card>
-                    )}
+                        )}
 
-                    {/* Vista de Subgerencia de Transportes */}
-                    {recaudacionStep === "transportes" && (
-                      <Card className="bg-white/95 backdrop-blur-sm p-8">
-                        {/* Bot√≥n Volver */}
-                        <button
-                          onClick={() => setRecaudacionStep("menu")}
-                          className="mb-4 flex items-center gap-2 text-yellow-600 hover:text-yellow-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
-                        <div className="mb-6">
-                          <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-1">
-                            <Building className="w-8 h-8 text-yellow-600" />
-                            Subgerencia de Transportes
-                          </h3>
-                          <p className="text-lg text-gray-600 ml-11">Recaudaci√≥n por Transportes</p>
-                        </div>
-                        <div className="grid grid-cols-1 gap-6">
+                        {/* Subgerencia de Transportes */}
+                        {selectedSubgerencias.includes("Subgerencia de Transportes") && (
                           <SubgerenciaCard
                             nombre="Subgerencia de Transportes"
                             titulo="Monto recaudado por Subgerencia de Transportes"
@@ -759,8 +700,8 @@ export default function Home() {
                                 soles: 63000, 
                                 cantidad: 330,
                                 subtipos: [
-                                  { subtipo: "Autorizaci√≥n", soles: 35000, cantidad: 180 },
-                                  { subtipo: "Habilitaci√≥n Vehicular (TUC)", soles: 28000, cantidad: 150 }
+                                  { subtipo: "Autorizaci+¶n", soles: 35000, cantidad: 180 },
+                                  { subtipo: "Habilitaci+¶n Vehicular (TUC)", soles: 28000, cantidad: 150 }
                                 ]
                               },
                               { 
@@ -768,8 +709,8 @@ export default function Home() {
                                 soles: 57000, 
                                 cantidad: 300,
                                 subtipos: [
-                                  { subtipo: "Autorizaci√≥n", soles: 32000, cantidad: 160 },
-                                  { subtipo: "Habilitaci√≥n Vehicular (TUC)", soles: 25000, cantidad: 140 }
+                                  { subtipo: "Autorizaci+¶n", soles: 32000, cantidad: 160 },
+                                  { subtipo: "Habilitaci+¶n Vehicular (TUC)", soles: 25000, cantidad: 140 }
                                 ]
                               },
                               { 
@@ -777,8 +718,8 @@ export default function Home() {
                                 soles: 48000, 
                                 cantidad: 270,
                                 subtipos: [
-                                  { subtipo: "Autorizaci√≥n", soles: 22000, cantidad: 120 },
-                                  { subtipo: "Renovaci√≥n", soles: 18000, cantidad: 100 },
+                                  { subtipo: "Autorizaci+¶n", soles: 22000, cantidad: 120 },
+                                  { subtipo: "Renovaci+¶n", soles: 18000, cantidad: 100 },
                                   { subtipo: "Duplicados", soles: 8000, cantidad: 50 }
                                 ]
                               },
@@ -787,9 +728,9 @@ export default function Home() {
                                 soles: 53000, 
                                 cantidad: 255,
                                 subtipos: [
-                                  { subtipo: "Sustituci√≥n", soles: 20000, cantidad: 90 },
-                                  { subtipo: "Habilitaci√≥n", soles: 15000, cantidad: 80 },
-                                  { subtipo: "Autorizaci√≥n", soles: 18000, cantidad: 85 }
+                                  { subtipo: "Sustituci+¶n", soles: 20000, cantidad: 90 },
+                                  { subtipo: "Habilitaci+¶n", soles: 15000, cantidad: 80 },
+                                  { subtipo: "Autorizaci+¶n", soles: 18000, cantidad: 85 }
                                 ]
                               },
                               { 
@@ -801,24 +742,24 @@ export default function Home() {
                                 ]
                               },
                               { 
-                                tipo: "Veh√≠culos Menores", 
+                                tipo: "Veh+°culos Menores", 
                                 soles: 36000, 
                                 cantidad: 210,
                                 subtipos: [
-                                  { subtipo: "Renovaci√≥n", soles: 10000, cantidad: 60 },
+                                  { subtipo: "Renovaci+¶n", soles: 10000, cantidad: 60 },
                                   { subtipo: "Incremento de flota", soles: 8000, cantidad: 45 },
-                                  { subtipo: "Sustituci√≥n de flota", soles: 7000, cantidad: 40 },
-                                  { subtipo: "Emisi√≥n TUC", soles: 6000, cantidad: 35 },
-                                  { subtipo: "Renovaci√≥n TUC", soles: 5000, cantidad: 30 }
+                                  { subtipo: "Sustituci+¶n de flota", soles: 7000, cantidad: 40 },
+                                  { subtipo: "Emisi+¶n TUC", soles: 6000, cantidad: 35 },
+                                  { subtipo: "Renovaci+¶n TUC", soles: 5000, cantidad: 30 }
                                 ]
                               },
                               { 
-                                tipo: "Certificaci√≥n", 
+                                tipo: "Certificaci+¶n", 
                                 soles: 13000, 
                                 cantidad: 83,
                                 subtipos: [
                                   { subtipo: "Taxis", soles: 3000, cantidad: 20 },
-                                  { subtipo: "Veh√≠culos menores", soles: 2500, cantidad: 18 },
+                                  { subtipo: "Veh+°culos menores", soles: 2500, cantidad: 18 },
                                   { subtipo: "Transporte Urbano", soles: 2000, cantidad: 15 },
                                   { subtipo: "Transporte Especial Estudiantes", soles: 1800, cantidad: 12 },
                                   { subtipo: "Transporte Especial Trabajadores", soles: 1700, cantidad: 10 },
@@ -830,8 +771,8 @@ export default function Home() {
                                 soles: 3500, 
                                 cantidad: 22,
                                 subtipos: [
-                                  { subtipo: "Autorizaci√≥n", soles: 2000, cantidad: 12 },
-                                  { subtipo: "Renovaci√≥n", soles: 1500, cantidad: 10 }
+                                  { subtipo: "Autorizaci+¶n", soles: 2000, cantidad: 12 },
+                                  { subtipo: "Renovaci+¶n", soles: 1500, cantidad: 10 }
                                 ]
                               },
                               { 
@@ -839,41 +780,21 @@ export default function Home() {
                                 soles: 4800, 
                                 cantidad: 35,
                                 subtipos: [
-                                  { subtipo: "Autorizaci√≥n", soles: 1800, cantidad: 11 },
-                                  { subtipo: "Renovaci√≥n", soles: 1000, cantidad: 8 },
-                                  { subtipo: "Sustituci√≥n", soles: 800, cantidad: 7 },
-                                  { subtipo: "Habilitaci√≥n", soles: 1200, cantidad: 9 }
+                                  { subtipo: "Autorizaci+¶n", soles: 1800, cantidad: 11 },
+                                  { subtipo: "Renovaci+¶n", soles: 1000, cantidad: 8 },
+                                  { subtipo: "Sustituci+¶n", soles: 800, cantidad: 7 },
+                                  { subtipo: "Habilitaci+¶n", soles: 1200, cantidad: 9 }
                                 ]
                               }
                             ]}
                           />
-                        </div>
-                      </Card>
-                    )}
+                        )}
 
-                    {/* Vista de Subgerencia de Tr√°nsito y Movilidad Urbana */}
-                    {recaudacionStep === "transito" && (
-                      <Card className="bg-white/95 backdrop-blur-sm p-8">
-                        {/* Bot√≥n Volver */}
-                        <button
-                          onClick={() => setRecaudacionStep("menu")}
-                          className="mb-4 flex items-center gap-2 text-green-600 hover:text-green-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
-                        <div className="mb-6">
-                          <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-1">
-                            <Users className="w-8 h-8 text-green-600" />
-                            Subgerencia de Tr√°nsito y Movilidad Urbana
-                          </h3>
-                          <p className="text-lg text-gray-600 ml-11">Recaudaci√≥n por Tr√°nsito</p>
-                        </div>
-                        <div className="grid grid-cols-1 gap-6">
+                        {/* Subgerencia de Tr+Ìnsito y Movilidad Urbana */}
+                        {selectedSubgerencias.includes("Subgerencia de Tr+Ìnsito y Movilidad Urbana") && (
                           <SubgerenciaCard
-                            nombre="Subgerencia de Tr√°nsito y Movilidad Urbana"
-                            titulo="Monto recaudado por Subgerencia de Tr√°nsito y Movilidad Urbana"
+                            nombre="Subgerencia de Tr+Ìnsito y Movilidad Urbana"
+                            titulo="Monto recaudado por Subgerencia de Tr+Ìnsito y Movilidad Urbana"
                             year={selectedYear}
                             metrica={selectedMetrica}
                             estado={selectedEstado}
@@ -889,12 +810,12 @@ export default function Home() {
                                 soles: 252304.84, 
                                 cantidad: 1830,
                                 subtipos: [
-                                  { subtipo: "Prestar el servicio en un veh√≠culo no habilitado - Muy Grave", soles: 164615.84, cantidad: 1194 },
-                                  { subtipo: "Por estacionarse en zonas prohibidas (paraderos informales, cruceros peatonales y zonas r√≠gidas) - Muy Grave", soles: 10746.56, cantidad: 280 },
+                                  { subtipo: "Prestar el servicio en un veh+°culo no habilitado - Muy Grave", soles: 164615.84, cantidad: 1194 },
+                                  { subtipo: "Por estacionarse en zonas prohibidas (paraderos informales, cruceros peatonales y zonas r+°gidas) - Muy Grave", soles: 10746.56, cantidad: 280 },
                                   { subtipo: "PRESTAR SERVICIO DE TRANSPORTES DE PERSONAS SIN CONTAR CON AUTORIZACION MUNICIPAL", soles: 31285.79, cantidad: 227 },
                                   { subtipo: "POR UTILIZAR LA VIA PUBLICA COMO PARADERO", soles: 19683.68, cantidad: 78 },
                                   { subtipo: "CIRCULAR CON UNIDADES VEHICULARES SIN LOS ELEMENTOS DE IDENTIFICACION DEL SERVICIO DE TAXI", soles: 10596.80, cantidad: 42 },
-                                  { subtipo: "Prohibir el tr√°nsito y estacionamiento de veh√≠culos cuatrimotos en las zonas urbanas en el √°mbito de la Provincia de Piura y la red vial provincial RESPONSABLE: PROPIETARIO, GRAVEDAD:", soles: 13386.17, cantidad: 5 },
+                                  { subtipo: "Prohibir el tr+Ìnsito y estacionamiento de veh+°culos cuatrimotos en las zonas urbanas en el +Ìmbito de la Provincia de Piura y la red vial provincial RESPONSABLE: PROPIETARIO, GRAVEDAD:", soles: 13386.17, cantidad: 5 },
                                   { subtipo: "Otros", soles: 1990.00, cantidad: 4 }
                                 ]
                               },
@@ -903,8 +824,8 @@ export default function Home() {
                                 soles: 155000, 
                                 cantidad: 2550,
                                 subtipos: [
-                                  { subtipo: "Emisi√≥n", soles: 80000, cantidad: 1200 },
-                                  { subtipo: "Revalidaci√≥n", soles: 45000, cantidad: 750 },
+                                  { subtipo: "Emisi+¶n", soles: 80000, cantidad: 1200 },
+                                  { subtipo: "Revalidaci+¶n", soles: 45000, cantidad: 750 },
                                   { subtipo: "Duplicado", soles: 15000, cantidad: 300 },
                                   { subtipo: "Reprogramaciones", soles: 15000, cantidad: 300 }
                                 ]
@@ -914,207 +835,17 @@ export default function Home() {
                                 soles: 55000, 
                                 cantidad: 600,
                                 subtipos: [
-                                  { subtipo: "Emisi√≥n", soles: 35000, cantidad: 400 },
-                                  { subtipo: "Revalidaci√≥n", soles: 15000, cantidad: 150 },
+                                  { subtipo: "Emisi+¶n", soles: 35000, cantidad: 400 },
+                                  { subtipo: "Revalidaci+¶n", soles: 15000, cantidad: 150 },
                                   { subtipo: "Duplicado", soles: 5000, cantidad: 50 }
                                 ]
                               },
                             ]}
                           />
-                        </div>
-                      </Card>
-                    )}
+                        )}
 
-                    {/* Vista de Subgerencia de Educaci√≥n y Seguridad Vial - Capacitaciones */}
-                    {recaudacionStep === "educacion" && (
-                      <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
-                        {/* Bot√≥n Volver */}
-                        <button
-                          onClick={() => setRecaudacionStep("menu")}
-                          className="mb-4 flex items-center gap-2 text-sky-600 hover:text-sky-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
-                        {/* Banner total choferes */}
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-2">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-blue-100 text-xs font-medium mb-1">Total personas capacitadas</p>
-                              <p className="text-2xl font-bold">
-                                {totalCapacitaciones.toLocaleString('es-PE')} personas capacitadas
-                              </p>
-                            </div>
-                            <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
-                              <div className="flex items-center gap-1">
-                                <span className="font-semibold">A√±o:</span>
-                                <select
-                                  value={capFilterYear}
-                                  onChange={(e) => setCapFilterYear(e.target.value)}
-                                  className="border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70"
-                                >
-                                  {capYearOptions.map((y) => (
-                                    <option key={y} value={y} className="text-gray-900">
-                                      {y}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div className="flex items-start gap-1 relative">
-                                <span className="font-semibold mt-0.5">Meses/Periodo:</span>
-                                <div className="relative">
-                                  <button
-                                    type="button"
-                                    onClick={() => setIsCapPeriodoOpen((prev) => !prev)}
-                                    className="flex items-center gap-1 border border-white/40 bg-white/10 text-white text-[10px] rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-white/70 min-w-[140px] justify-between"
-                                  >
-                                    <span className="truncate text-left">
-                                      {capSelectedPeriodSummary}
-                                    </span>
-                                    <span className="text-[9px]">‚ñº</span>
-                                  </button>
-                                  {isCapPeriodoOpen && (
-                                    <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
-                                      <div className="p-2 text-[11px] font-semibold text-gray-700 border-b border-gray-100">
-                                        Selecciona meses / periodos
-                                      </div>
-                                      <div className="p-2 flex flex-col gap-1 text-xs">
-                                        {capPeriodoOptions.map((p) => {
-                                          const checked = capFilterPeriodos.includes(p.value)
-                                          return (
-                                            <label
-                                              key={p.value}
-                                              className="flex items-center gap-2 px-1 py-0.5 rounded hover:bg-gray-100 cursor-pointer"
-                                            >
-                                              <input
-                                                type="checkbox"
-                                                className="h-3 w-3 accent-blue-600"
-                                                checked={checked}
-                                                onChange={(e) => {
-                                                  setCapFilterPeriodos((prev) => {
-                                                    const monthValues = capPeriodoOptions
-                                                      .filter((opt) => opt.value !== "Todos")
-                                                      .map((opt) => opt.value)
-
-                                                    if (e.target.checked) {
-                                                      if (p.value === "Todos") {
-                                                        return ["Todos", ...monthValues]
-                                                      }
-                                                      return [...prev.filter((v) => v !== "Todos"), p.value]
-                                                    }
-
-                                                    if (p.value === "Todos") {
-                                                      return []
-                                                    }
-
-                                                    const next = prev.filter((v) => v !== p.value)
-                                                    const remainingMonths = next.filter((v) => v !== "Todos")
-                                                    return remainingMonths.length === 0 ? [] : next
-                                                  })
-                                                }}
-                                              />
-                                              <span className="text-[11px]">{p.label}</span>
-                                            </label>
-                                          )
-                                        })}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Capacitaciones por temas */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-600" />
-                            Capacitaciones por temas
-                          </h4>
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            {capacitacionTemasData.map((item) => (
-                              <div key={item.tema} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
-                                <p className="text-sm font-semibold text-gray-900">
-                                  {item.choferes.toLocaleString('es-PE')} Personas capacitadas en
-                                </p>
-                                <p className="text-xs text-gray-700 mt-1">{item.tema}</p>
-                              </div>
-                            ))}
-                          </div>
-
-                          <p className="mt-4 text-xs md:text-sm text-gray-700 font-semibold bg-green-50 border border-green-200 rounded-md px-3 py-2">
-                            Las capacitaciones del Programa de Seguridad Vial es obligatorio para obtener sus permisos de circulaci√≥n
-                          </p>
-                        </div>
-
-                        {/* Capacitaciones por modo de transporte */}
-                        <div className="space-y-3">
-                          <h3 className="text-xl font-bold text-gray-900">Capacitaciones por modo de transporte</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            {capacitacionPorModo.map((item) => (
-                              <div key={item.modo} className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-center shadow-sm">
-                                <p className="text-sm font-semibold text-gray-900">
-                                  {item.cantidad.toLocaleString('es-PE')} choferes capacitados
-                                </p>
-                                <p className="text-xs text-gray-700 mt-1">en {item.modo.toLowerCase()}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Total de Choferes capacitados por mes */}
-                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-600" />
-                            Total de choferes capacitados por mes
-                          </h4>
-
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              {filteredCapacitacionMensualData.map((item) => (
-                                <div key={item.mes} className="flex items-center gap-2">
-                                  <span className="text-xs font-medium text-gray-600 w-20">{item.mes}</span>
-                                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
-                                    <div
-                                      className="bg-green-500 h-full rounded-full transition-all"
-                                      style={{ width: `${maxChoferesMensual ? (item.choferes / maxChoferesMensual) * 100 : 0}%` }}
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-xs">
-                                <thead>
-                                  <tr className="border-b">
-                                    <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Veh√≠culo Menores</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Taxis</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Transporte Urbano</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de choferes capacitadas por mes</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {filteredCapacitacionMensualData.map((item) => (
-                                    <tr key={item.mes} className="border-b hover:bg-gray-50">
-                                      <td className="py-2 px-2 text-gray-700">{item.mes}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.vm.toLocaleString('es-PE')}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.taxis.toLocaleString('es-PE')}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.tu.toLocaleString('es-PE')}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.choferes.toLocaleString('es-PE')}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    )}
+                      </div>
+                    </Card>
 
                    </div>
                 )}
@@ -1127,9 +858,9 @@ export default function Home() {
                           <div>
                             <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                               <GraduationCap className="w-8 h-8 text-green-600" />
-                              Sub. Seguridad Educaci√≥n Vial
+                              Sub. Seguridad Educaci+¶n Vial
                             </h3>
-                            <p className="text-gray-600">Capacitaciones viales realizadas por la Subgerencia de Seguridad y Educaci√≥n Vial</p>
+                            <p className="text-gray-600">Capacitaciones viales realizadas por la Subgerencia de Seguridad y Educaci+¶n Vial</p>
                           </div>
                         </div>
                       </Card>
@@ -1137,15 +868,6 @@ export default function Home() {
 
                     {capStep === "detalle" && (
                       <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
-                        {/* Bot√≥n Atr√°s */}
-                        <button
-                          onClick={() => setCapStep("subgerencia")}
-                          className="mb-4 flex items-center gap-2 text-green-600 hover:text-green-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
                         {/* Banner total choferes - mismo formato que otros encabezados */}
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-lg text-white shadow-lg mb-2">
                           <div className="flex items-center justify-between">
@@ -1157,7 +879,7 @@ export default function Home() {
                             </div>
                             <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
                               <div className="flex items-center gap-1">
-                                <span className="font-semibold">A√±o:</span>
+                                <span className="font-semibold">A+¶o:</span>
                                 <select
                                   value={capFilterYear}
                                   onChange={(e) => setCapFilterYear(e.target.value)}
@@ -1181,7 +903,7 @@ export default function Home() {
                                     <span className="truncate text-left">
                                       {capSelectedPeriodSummary}
                                     </span>
-                                    <span className="text-[9px]">‚ñº</span>
+                                    <span className="text-[9px]">‘˚+</span>
                                   </button>
                                   {isCapPeriodoOpen && (
                                     <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
@@ -1255,7 +977,7 @@ export default function Home() {
                           </div>
 
                           <p className="mt-4 text-xs md:text-sm text-gray-700 font-semibold bg-green-50 border border-green-200 rounded-md px-3 py-2">
-                            Las capacitaciones del Programa de Seguridad Vial es obligatorio para obtener sus permisos de circulaci√≥n
+                            Las capacitaciones del Programa de Seguridad Vial es obligatorio para obtener sus permisos de circulaci+¶n
                           </p>
                         </div>
 
@@ -1301,7 +1023,7 @@ export default function Home() {
                                 <thead>
                                   <tr className="border-b">
                                     <th className="text-left py-2 px-2 font-semibold text-gray-700">Mes</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Veh√≠culo Menores</th>
+                                    <th className="text-right py-2 px-2 font-semibold text-gray-700">Veh+°culo Menores</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Taxis</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Transporte Urbano</th>
                                     <th className="text-right py-2 px-2 font-semibold text-gray-700">Total de choferes capacitadas por mes</th>
@@ -1327,12 +1049,12 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Secci√≥n de Certificaciones (temporalmente deshabilitada)
+                {/* Secci+¶n de Certificaciones (temporalmente deshabilitada)
                 {selectedCategory === "certificaciones" && (
                   <TipoDetailModal
                     isOpen={true}
                     onClose={() => setSelectedCategory(null)}
-                    subgerencia="Subgerencia de Tr√°nsito y Movilidad Urbana"
+                    subgerencia="Subgerencia de Tr+Ìnsito y Movilidad Urbana"
                     tipo="Certificaciones"
                     year={selectedYear}
                     metrica="cantidad"
@@ -1353,34 +1075,23 @@ export default function Home() {
                           <div>
                             <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                               <Building className="w-8 h-8 text-orange-600" />
-                              Subgerencia de Tr√°nsito y Movilidad Urbana
+                              Subgerencia de Tr+Ìnsito y Movilidad Urbana
                             </h3>
-                            <p className="text-gray-600">Indicadores de Se√±alizaci√≥n dentro de la Subgerencia de Tr√°nsito</p>
+                            <p className="text-gray-600">Indicadores de Se+¶alizaci+¶n dentro de la Subgerencia de Tr+Ìnsito</p>
                           </div>
                         </div>
                       </Card>
                     )}
 
                     {senalStep === "horizontal" && (
-                      <Card className="bg-white/95 backdrop-blur-sm p-8">
-                        {/* Bot√≥n Atr√°s */}
-                        <button
-                          onClick={() => setSenalStep("subgerencia")}
-                          className="mb-4 flex items-center gap-2 text-orange-600 hover:text-orange-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
-                        <div className="cursor-pointer hover:shadow-lg transition-all" onClick={() => setSenalStep("detalle")}>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                                <Building className="w-8 h-8 text-orange-600" />
-                                Se√±ales Horizontales de v√≠as
-                              </h3>
-                              <p className="text-gray-600">Se√±alizaci√≥n horizontal para mantenimiento de v√≠as</p>
-                            </div>
+                      <Card className="bg-white/95 backdrop-blur-sm p-8 cursor-pointer hover:shadow-lg transition-all" onClick={() => setSenalStep("detalle")}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                              <Building className="w-8 h-8 text-orange-600" />
+                              Se+¶ales Horizontales de v+°as
+                            </h3>
+                            <p className="text-gray-600">Se+¶alizaci+¶n horizontal para mantenimiento de v+°as</p>
                           </div>
                         </div>
                       </Card>
@@ -1388,21 +1099,12 @@ export default function Home() {
 
                     {senalStep === "detalle" && (
                       <Card className="bg-white/95 backdrop-blur-sm p-8 space-y-6">
-                        {/* Bot√≥n Atr√°s */}
-                        <button
-                          onClick={() => setSenalStep("horizontal")}
-                          className="mb-4 flex items-center gap-2 text-orange-600 hover:text-orange-800 font-medium transition-colors"
-                        >
-                          <ArrowLeft className="w-5 h-5" />
-                          Atr√°s
-                        </button>
-                        
                         <div className="flex flex-col gap-2">
                           <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                             <Building className="w-8 h-8 text-orange-600" />
-                            Subgerencia de Tr√°nsito y Movilidad Urbana ‚Üí Se√±ales Horizontales de v√≠as
+                            Subgerencia de Tr+Ìnsito y Movilidad Urbana ‘Â∆ Se+¶ales Horizontales de v+°as
                           </h3>
-                          <p className="text-lg text-gray-600 font-semibold">M2 de se√±alizaci√≥n horizontal</p>
+                          <p className="text-lg text-gray-600 font-semibold">M2 de se+¶alizaci+¶n horizontal</p>
                         </div>
 
                         {/* Total m2 destacado */}
@@ -1410,11 +1112,11 @@ export default function Home() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="text-orange-100 text-xs font-medium mb-1">Total intervenido</p>
-                              <p className="text-2xl font-bold">{totalM2Senalizacion.toLocaleString("es-PE")} m¬≤</p>
+                              <p className="text-2xl font-bold">{totalM2Senalizacion.toLocaleString("es-PE")} m-¶</p>
                             </div>
                             <div className="flex flex-wrap items-center md:items-center justify-end gap-2 md:gap-3 text-[10px] md:text-xs">
                               <div className="flex items-center gap-1">
-                                <span className="font-semibold">A√±o:</span>
+                                <span className="font-semibold">A+¶o:</span>
                                 <select
                                   value={senalFilterYear}
                                   onChange={(e) => setSenalFilterYear(e.target.value)}
@@ -1438,7 +1140,7 @@ export default function Home() {
                                     <span className="truncate text-left">
                                       {senalSelectedPeriodSummary}
                                     </span>
-                                    <span className="text-[9px]">‚ñº</span>
+                                    <span className="text-[9px]">‘˚+</span>
                                   </button>
                                   {isSenalPeriodoOpen && (
                                     <div className="absolute right-0 mt-1 max-h-56 w-56 overflow-auto rounded-md bg-white text-gray-900 shadow-lg border border-gray-200 z-20">
@@ -1494,18 +1196,18 @@ export default function Home() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          {/* Registro de Mantenimiento de Se√±alizaci√≥n Horizontal por tipo */}
+                          {/* Registro de Mantenimiento de Se+¶alizaci+¶n Horizontal por tipo */}
                           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                             <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                               <TrendingUp className="w-4 h-4 text-orange-600" />
-                              Registro de Mantenimiento de Se√±alizaci√≥n Horizontal por tipo
+                              Registro de Mantenimiento de Se+¶alizaci+¶n Horizontal por tipo
                             </h4>
 
                             <div className="grid grid-cols-1 gap-3">
                               {senalizacionTiposData.map((item) => (
                                 <div key={item.tipo} className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3 flex items-center justify-between">
                                   <div>
-                                    <p className="text-lg font-bold text-gray-900">{item.m2.toLocaleString('es-PE')} m¬≤</p>
+                                    <p className="text-lg font-bold text-gray-900">{item.m2.toLocaleString('es-PE')} m-¶</p>
                                     <p className="text-sm text-orange-700 font-medium">{item.tipo}</p>
                                   </div>
                                 </div>
@@ -1513,11 +1215,11 @@ export default function Home() {
                             </div>
                           </div>
 
-                          {/* Registro de Mantenimiento de Se√±alizaci√≥n Horizontal por Mes */}
+                          {/* Registro de Mantenimiento de Se+¶alizaci+¶n Horizontal por Mes */}
                           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
                             <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                               <TrendingUp className="w-4 h-4 text-orange-600" />
-                              Registro de Mantenimiento de Se√±alizaci√≥n Horizontal por Mes
+                              Registro de Mantenimiento de Se+¶alizaci+¶n Horizontal por Mes
                             </h4>
 
                             <div className="overflow-x-auto">
@@ -1532,7 +1234,7 @@ export default function Home() {
                                   {filteredSenalizacionMensualData.map((item) => (
                                     <tr key={item.mes} className="border-b hover:bg-gray-50">
                                       <td className="py-2 px-2 text-gray-700">{item.mes}</td>
-                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m¬≤</td>
+                                      <td className="py-2 px-2 text-right font-medium text-gray-900">{item.m2.toLocaleString('es-PE')} m-¶</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1554,7 +1256,7 @@ export default function Home() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
                       <PermisoCard
                         id="P01"
-                        title="N√∫mero de permisos de circulaci√≥n"
+                        title="N+¶mero de permisos de circulaci+¶n"
                         chartData={{
                           enero: 120,
                           febrero: 135,
@@ -1572,7 +1274,7 @@ export default function Home() {
                       />
                       <PermisoCard
                         id="P02"
-                        title="N√∫mero de autorizaciones"
+                        title="N+¶mero de autorizaciones"
                         chartData={{
                           enero: 85,
                           febrero: 92,
@@ -1590,7 +1292,7 @@ export default function Home() {
                       />
                       <PermisoCard
                         id="P03"
-                        title="N√∫mero de emisi√≥n de brevetes"
+                        title="N+¶mero de emisi+¶n de brevetes"
                         chartData={{
                           enero: 200,
                           febrero: 215,
@@ -1608,7 +1310,7 @@ export default function Home() {
                       />
                       <PermisoCard
                         id="P04"
-                        title="N√∫mero de Intervenciones"
+                        title="N+¶mero de Intervenciones"
                         chartData={{
                           enero: 45,
                           febrero: 52,
@@ -1626,7 +1328,7 @@ export default function Home() {
                       />
                       <PermisoCard
                         id="P05"
-                        title="N√∫mero de empresas de taxi formalizadas"
+                        title="N+¶mero de empresas de taxi formalizadas"
                         chartData={{
                           enero: 12,
                           febrero: 15,
