@@ -1,0 +1,7 @@
+export { TransporteIndicadores } from "./TransporteIndicadores"
+export { GerenciaView } from "./GerenciaView"
+export { SubgerenciaTransporteView } from "./SubgerenciaTransporteView"
+export { SubgerenciaFiscalizacionView } from "./SubgerenciaFiscalizacionView"
+export { SubgerenciaTransitoView } from "./SubgerenciaTransitoView"
+export { SubgerenciaEducacionView } from "./SubgerenciaEducacionView"
+export * from "./data"
